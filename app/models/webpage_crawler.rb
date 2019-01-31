@@ -1,5 +1,4 @@
 class WebpageCrawler
-
 	def initialize(url)
 		@url = url
 	end
@@ -19,11 +18,12 @@ class WebpageCrawler
 				content = nil	
 			end
 
+			next if content == nil
+
 			# For a recipe schema this should be `application/ld+json`
 			script_element_type = script_element.attributes["type"]&.value
 			
 			if content
-				schema_source = content["@context"]
 				schema_type = content["@type"]
 			else
 				schema_type, schema_source = nil
@@ -35,6 +35,14 @@ class WebpageCrawler
 				parse_recipe_json(content)
 			end
 		end
+	end
+
+	# There are many schemas which have the same script tag
+	# of `application/ld+json` but we only want the ones from 
+	# schema.org and those of type "Recipe"
+	def is_a_recipe_schema?(script_element, source, type)
+		script_element == "application/ld+json" &&
+		type == "Recipe"
 	end
 
 	# Parses the recipe json from the page
@@ -85,14 +93,5 @@ class WebpageCrawler
 			rating_value: raw_params[:aggregateRating][:ratingValue],
 			rating_count: raw_params[:aggregateRating][:ratingCount],
 		}
-	end
-
-	# There are many schemas which have the same script tag
-	# of `application/ld+json` but we only want the ones from 
-	# schema.org and those of type "Recipe"
-	def is_a_recipe_schema?(script_element, source, type)
-		script_element == "application/ld+json" &&
-		source == "http://schema.org" &&
-		type == "Recipe"
 	end
 end

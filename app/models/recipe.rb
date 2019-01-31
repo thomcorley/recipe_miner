@@ -1,4 +1,4 @@
 class Recipe < ApplicationRecord
-	has_many :ingredients
-	has_many :instructions
+	has_many :ingredients, dependent: :destroy
+	has_many :instructions, dependent: :destroy
 end

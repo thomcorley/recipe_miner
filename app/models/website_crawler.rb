@@ -1,5 +1,4 @@
 class WebsiteCrawler
-	
 	def initialize(url)
 		@url = url
 	end
