@@ -10,6 +10,52 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 0) do
+ActiveRecord::Schema.define(version: 20190131030230) do
+
+  create_table "delayed_jobs", force: :cascade do |t|
+    t.integer "priority", default: 0, null: false
+    t.integer "attempts", default: 0, null: false
+    t.text "handler", null: false
+    t.text "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string "locked_by"
+    t.string "queue"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.index ["priority", "run_at"], name: "delayed_jobs_priority"
+  end
+
+  create_table "ingredients", force: :cascade do |t|
+    t.integer "position"
+    t.text "description"
+    t.integer "recipe_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["recipe_id"], name: "index_ingredients_on_recipe_id"
+  end
+
+  create_table "instructions", force: :cascade do |t|
+    t.integer "position"
+    t.text "description"
+    t.integer "recipe_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["recipe_id"], name: "index_instructions_on_recipe_id"
+  end
+
+  create_table "recipes", force: :cascade do |t|
+    t.string "title", null: false
+    t.string "image_url", null: false
+    t.string "total_time"
+    t.string "yield"
+    t.string "description", null: false
+    t.integer "rating_value"
+    t.integer "rating_count"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "recipe_url", null: false
+  end
 
 end
