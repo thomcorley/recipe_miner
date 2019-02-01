@@ -10,13 +10,8 @@ class WebsiteCrawler
 
 		nokogiri_link_objects.each do |link_object|
 			url_of_webpage = link_object.text
-			WebpageCrawler.new(url_of_webpage).crawl
+			WebpageCrawlerJob.schedule(url_of_webpage)
 		end
-	end
-
-	def has_sitemap?
-		sitemap_request = HTTParty.get(construct_url_from(@url) + "/sitemap.xml")
-		sitemap_request.code == 200 ? true : false
 	end
 
 	# The url of the recipe website may have subdomains, query string params etc

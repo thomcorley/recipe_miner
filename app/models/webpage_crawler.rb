@@ -38,8 +38,7 @@ class WebpageCrawler
 	end
 
 	# There are many schemas which have the same script tag
-	# of `application/ld+json` but we only want the ones from 
-	# schema.org and those of type "Recipe"
+	# of `application/ld+json` but we only want the ones of type "Recipe"
 	def is_a_recipe_schema?(script_element, source, type)
 		script_element == "application/ld+json" &&
 		type == "Recipe"

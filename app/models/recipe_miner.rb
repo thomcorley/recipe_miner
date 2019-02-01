@@ -17,8 +17,20 @@ class RecipeMiner
 	  	url_list.each do |website_url|
 	  		next unless has_sitemap?(website_url)
 
-	  		Delayed::Job.enqueue WebsiteCrawlerJob.new(website_url)	
+	  		WebsiteCrawlerJob.schedule(website_url)
 			end
+		end
+
+		def has_sitemap?(website_url)
+			sitemap_request = HTTParty.get(construct_url_from(website_url) + "/sitemap.xml")
+			sitemap_request.code == 200 ? true : false
+		end
+
+		# The url of the recipe website may have subdomains, query string params etc
+		# so we want to extract only the plain url.
+		def construct_url_from(full_web_address)
+			uri = URI.parse(full_web_address.strip)
+			uri.scheme + "://" + uri.host
 		end
 	end
 end
