@@ -4,8 +4,8 @@ class RecipeMiner
 
 		WEBSITE_LIST = "lib/website_directory.txt"
 
-		def start_mining
-			recipe_websites = File.open(WEBSITE_LIST, "r")
+		def start_mining(website_list = WEBSITE_LIST)
+			recipe_websites = File.open(website_list, "r")
 
 			url_list = []
 

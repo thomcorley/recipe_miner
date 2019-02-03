@@ -6,11 +6,26 @@ class WebsiteCrawler
 	def crawl
 		sitemap_request = HTTParty.get(construct_url_from(@url) + "/sitemap.xml")
 
+
 		nokogiri_link_objects = get_links_from_sitemap(sitemap_request.body)
 
-		nokogiri_link_objects.each do |link_object|
-			url_of_webpage = link_object.text
-			WebpageCrawlerJob.schedule(url_of_webpage)
+		# Assuming that if there are less than 50 links in the sitemap
+		# its a sitemap of sitemaps and we have to loop through each link
+		if nokogiri_link_objects.count < 50
+			nokogiri_link_objects.each do |single_sitemap_object|
+				inner_sitemap = HTTParty.get(single_sitemap_object.text).body
+				inner_link_objects = get_links_from_sitemap(inner_sitemap)
+
+				inner_link_objects.each do |inner_link_object|
+					url_of_webpage = inner_link_object.text
+					WebpageCrawlerJob.schedule(url_of_webpage)
+				end
+			end
+		else
+			nokogiri_link_objects.each do |link_object|
+				url_of_webpage = link_object.text
+				WebpageCrawlerJob.schedule(url_of_webpage)
+			end
 		end
 	end
 

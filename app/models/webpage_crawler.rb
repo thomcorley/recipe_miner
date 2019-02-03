@@ -11,35 +11,24 @@ class WebpageCrawler
 
 		# Putting this in a rescue block to handle the script elements
 		# that can't be parsed as JSON
-		script_elements.each do |script_element|
-			begin
-				content = JSON.parse(script_element.text)
-			rescue
-				content = nil	
-			end
+		json_elements = script_elements.select do |element|
+			element.attributes["type"]&.value == "application/ld+json"
+		end
+		
+		json_elements.each do |json_element|
+			content = JSON.parse(json_element.text)
 
-			next if content == nil
+			next if content.nil?
 
-			# For a recipe schema this should be `application/ld+json`
-			script_element_type = script_element.attributes["type"]&.value
-			
-			if content
-				schema_type = content["@type"]
-			else
-				schema_type, schema_source = nil
-			end
+			schema_is_for_a_recipe = is_a_recipe_schema?(json_element.attributes["type"].value, content["@type"])
 
-			schema_is_for_a_recipe = is_a_recipe_schema?(script_element_type, schema_source, schema_type)
-
-			if schema_is_for_a_recipe && content
-				parse_recipe_json(content)
-			end
+			parse_recipe_json(content) if schema_is_for_a_recipe
 		end
 	end
 
 	# There are many schemas which have the same script tag
 	# of `application/ld+json` but we only want the ones of type "Recipe"
-	def is_a_recipe_schema?(script_element, source, type)
+	def is_a_recipe_schema?(script_element, type)
 		script_element == "application/ld+json" &&
 		type == "Recipe"
 	end
@@ -48,20 +37,26 @@ class WebpageCrawler
 	# and saves it to the database
 	def parse_recipe_json(json_content)
 		recipe_hash = json_content.deep_symbolize_keys
-		recipe = save_recipe(recipe_hash)
 
-		save_ingredients(recipe_hash, recipe.id)
-		save_instructions(recipe_hash, recipe.id)
+		begin
+			recipe = save_recipe(recipe_hash)
+			save_ingredients(recipe_hash, recipe.id)
+			save_instructions(recipe_hash, recipe.id)
+
+			puts "Successfully added Recipe: #{recipe.title}"
+		rescue
+			puts "Could not add recipe:"
+		end
 	end
 
 	# `recipe_hash` is the json content of the recipe
 	# data, converted to a hash with symbols as keys
 	def save_recipe(recipe_hash)
-		recipe_keys = [:name, :image, :totalTime, :recipeYield, :description, :aggregateRating]
-		raw_params = recipe_hash.select { |k,v| recipe_keys.include?(k) }
-		formatted_recipe_params = sanitize_recipe_params(raw_params).merge(recipe_url: @url)
+		raise "Missing essential recipe information" unless minimum_params_are_present?(recipe_hash)
 
-		Recipe.create!(formatted_recipe_params)
+		formatted_recipe_params = sanitize_recipe_params(recipe_hash).merge(recipe_url: @url)
+
+		recipe = Recipe.create!(formatted_recipe_params)
 	end
 
 	def save_ingredients(recipe_hash, recipe_id)
@@ -74,23 +69,39 @@ class WebpageCrawler
 	end
 
 	def save_instructions(recipe_hash, recipe_id)
-		instructions_array = recipe_hash[:recipeInstructions]
+		instructions = recipe_hash[:recipeInstructions]
 
-		instructions_array.each_with_index do |instruction, index|
-			position = index + 1
-			Instruction.create!(position: position, description: instruction, recipe_id: recipe_id)
+		if instructions.is_a?(Array)
+			instructions_array.each_with_index do |instruction, index|
+				position = index + 1
+				Instruction.create!(position: position, description: instruction, recipe_id: recipe_id)
+			end
+		elsif instructions.is_a?(String)
+			Instruction.create!(position: 1, description: instructions, recipe_id: recipe_id)
 		end
 	end
 
-	def sanitize_recipe_params(raw_params)
+	def sanitize_recipe_params(params)		
 		{
-			title: raw_params[:name],
-			image_url: raw_params[:image],
-			total_time: raw_params[:totalTime],
-			yield: raw_params[:recipeYield],
-			description: raw_params[:description],
-			rating_value: raw_params[:aggregateRating][:ratingValue],
-			rating_count: raw_params[:aggregateRating][:ratingCount],
+			title: detect_param(params, :name),
+			image_url: detect_param(params, :image),
+			total_time: detect_param(params, :totalTime),
+			yield: detect_param(params, :recipeYield),
+			description: detect_param(params, :description),
+			rating_value: detect_param(params, :aggregateRating)&[:ratingValue],
+			rating_count: detect_param(params, :aggregateRating)&[:ratingCount],
 		}
+	end
+
+	def minimum_params_are_present?(params)
+		if params[:name] && params[:image] && params[:recipeIngredient] && params[:recipeInstructions]
+			true
+		else 
+			false
+		end
+	end
+
+	def detect_param(params, key)
+		params[key] ? params[key] : nil
 	end
 end
