@@ -4,6 +4,8 @@ class WebpageCrawler
 	end
 
 	def crawl
+		return nil if recipe_exists?(@url)
+
 		recipe_page = HTTParty.get(@url)
 
 		# Grab all the script elements in the page and loop through them
@@ -45,7 +47,7 @@ class WebpageCrawler
 
 			puts "Successfully added Recipe: #{recipe.title}"
 		rescue
-			puts "Could not add recipe:"
+			puts "Could not add recipe!"
 		end
 	end
 
@@ -56,7 +58,7 @@ class WebpageCrawler
 
 		formatted_recipe_params = sanitize_recipe_params(recipe_hash).merge(recipe_url: @url)
 
-		recipe = Recipe.create!(formatted_recipe_params)
+		Recipe.create!(formatted_recipe_params)
 	end
 
 	def save_ingredients(recipe_hash, recipe_id)
@@ -77,19 +79,24 @@ class WebpageCrawler
 				Instruction.create!(position: position, description: instruction, recipe_id: recipe_id)
 			end
 		elsif instructions.is_a?(String)
-			Instruction.create!(position: 1, description: instructions, recipe_id: recipe_id)
+			if instructions.match?(/\n/)
+				instructions.split("\n").each_with_index do |instruction, index|
+					position = index + 1
+					Instruction.create!(position: position, description: instruction, recipe_id: recipe_id)
+				end
+			else
+				Instruction.create!(position: 1, description: instructions, recipe_id: recipe_id)
+			end
 		end
 	end
 
-	def sanitize_recipe_params(params)		
+	def sanitize_recipe_params(params)
 		{
 			title: detect_param(params, :name),
 			image_url: detect_param(params, :image),
 			total_time: detect_param(params, :totalTime),
 			yield: detect_param(params, :recipeYield),
-			description: detect_param(params, :description),
-			rating_value: detect_param(params, :aggregateRating)&[:ratingValue],
-			rating_count: detect_param(params, :aggregateRating)&[:ratingCount],
+			description: detect_param(params, :description)
 		}
 	end
 
@@ -103,5 +110,9 @@ class WebpageCrawler
 
 	def detect_param(params, key)
 		params[key] ? params[key] : nil
+	end
+
+	def recipe_exists?(url)
+		Recipe.where(recipe_url: url).any?
 	end
 end

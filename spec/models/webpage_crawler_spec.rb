@@ -28,15 +28,37 @@ RSpec.describe WebpageCrawler, type: :model do
 
   describe "#is_a_recipe_schema" do  	
   	it "returns true for a valid recipe schema" do  	
-  		is_schema = @crawler.is_a_recipe_schema?("application/ld+json", "http://schema.org", "Recipe")
+  		is_schema = @crawler.is_a_recipe_schema?("application/ld+json", "Recipe")
 
   		expect(is_schema).to be true
 	  end
 
   	it "returns false for a schema of a different type" do  	
-  		is_schema = @crawler.is_a_recipe_schema?("application/ld+json", "http://schema.org", "Horse")
+  		is_schema = @crawler.is_a_recipe_schema?("application/ld+json", "Horse")
 
   		expect(is_schema).to be false	
 	  end	  
-  end  
+  end
+
+  describe "#save_ingredients" do
+    let(:recipe) { FactoryBot.create(:recipe) }
+    let(:webpage_crawler) { WebpageCrawler.new("https://www.grubdaily.com/classic-omelette.jpg") }
+
+    it "handles an array of ingredients" do
+      webpage_crawler.save_ingredients(@recipe_hash, recipe.id)
+      expect(recipe.reload.ingredients.count).to eq 11
+    end
+  end
+
+  describe "#save_instructions" do
+    let(:recipe) { FactoryBot.create(:recipe) }
+    let(:webpage_crawler) { WebpageCrawler.new("https://www.grubdaily.com/classic-omelette.jpg") }
+    
+    it "parses instructions separated by newline characters" do
+      @recipe_hash[:recipeInstructions] = "Instructions separated\nby newline\ncharacters"
+      webpage_crawler.save_instructions(@recipe_hash, recipe.id)
+
+      expect(recipe.reload.instructions.count).to eq 3
+    end
+  end
 end
