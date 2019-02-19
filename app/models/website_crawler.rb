@@ -4,8 +4,14 @@ class WebsiteCrawler
 	end
 
 	def crawl
+		logger =  Rails.logger
+
 		sitemap_request = HTTParty.get(construct_url_from(@url) + "/sitemap.xml")
 
+		if sitemap_request.code != 200
+			logger.info("Could not crawl website: sitemap not available")
+			return
+		end
 
 		nokogiri_link_objects = get_links_from_sitemap(sitemap_request.body)
 

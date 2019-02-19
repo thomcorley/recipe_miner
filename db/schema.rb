@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190131030230) do
+ActiveRecord::Schema.define(version: 20190219025320) do
 
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
@@ -50,7 +50,7 @@ ActiveRecord::Schema.define(version: 20190131030230) do
     t.string "image_url", null: false
     t.string "total_time"
     t.string "yield"
-    t.string "description", null: false
+    t.string "description"
     t.integer "rating_value"
     t.integer "rating_count"
     t.datetime "created_at", null: false

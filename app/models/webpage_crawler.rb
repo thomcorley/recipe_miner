@@ -1,11 +1,14 @@
 class WebpageCrawler
-	def initialize(url)
+	def initialize(url, logger = Rails.logger)
 		@url = url
+		@logger = logger
 	end
 
 	def crawl
-		return nil if recipe_exists?(@url)
-
+		if recipe_exists?(@url)
+			@logger.info("Recipe already exists")
+			return
+		end
 		recipe_page = HTTParty.get(@url)
 
 		# Grab all the script elements in the page and loop through them
@@ -24,7 +27,11 @@ class WebpageCrawler
 
 			schema_is_for_a_recipe = is_a_recipe_schema?(json_element.attributes["type"].value, content["@type"])
 
-			parse_recipe_json(content) if schema_is_for_a_recipe
+			if schema_is_for_a_recipe
+				parse_recipe_json(content)
+			else
+				@logger.info("JSON did not contain recipe data")
+			end
 		end
 	end
 
@@ -44,10 +51,9 @@ class WebpageCrawler
 			recipe = save_recipe(recipe_hash)
 			save_ingredients(recipe_hash, recipe.id)
 			save_instructions(recipe_hash, recipe.id)
-
-			puts "Successfully added Recipe: #{recipe.title}"
-		rescue
-			puts "Could not add recipe!"
+		rescue StandardError => e
+			raise e
+			@logger.info("Error: Could not add recipe: #{e}")
 		end
 	end
 
@@ -56,37 +62,62 @@ class WebpageCrawler
 	def save_recipe(recipe_hash)
 		raise "Missing essential recipe information" unless minimum_params_are_present?(recipe_hash)
 
-		formatted_recipe_params = sanitize_recipe_params(recipe_hash).merge(recipe_url: @url)
+		recipe_hash = handle_mutiple_images(recipe_hash)
 
-		Recipe.create!(formatted_recipe_params)
+		formatted_recipe_params = sanitize_recipe_params(recipe_hash).merge(recipe_url: @url)
+		
+		recipe = Recipe.create!(formatted_recipe_params)
+		@logger.info("Successfully got recipe: #{recipe.title}")
+		recipe
 	end
 
 	def save_ingredients(recipe_hash, recipe_id)
 		ingredients_array = recipe_hash[:recipeIngredient]
+		begin
+			ingredients_array.each_with_index do |ingredient, index|
 
-		ingredients_array.each_with_index do |ingredient, index|
-			position = index + 1
-			Ingredient.create!(position: position, description: ingredient, recipe_id: recipe_id)
-		end		
+				position = index + 1
+				Ingredient.create!(position: position, description: ingredient, recipe_id: recipe_id)
+			end
+			@logger.info("Successfully got ingredients")
+		rescue StandardError => e
+			@logger.info("Error: Could not add recipe: #{e}")
+			raise e
+		end
 	end
 
 	def save_instructions(recipe_hash, recipe_id)
 		instructions = recipe_hash[:recipeInstructions]
 
-		if instructions.is_a?(Array)
-			instructions_array.each_with_index do |instruction, index|
-				position = index + 1
-				Instruction.create!(position: position, description: instruction, recipe_id: recipe_id)
-			end
-		elsif instructions.is_a?(String)
-			if instructions.match?(/\n/)
-				instructions.split("\n").each_with_index do |instruction, index|
+		if instructions.nil?
+			@logger.info("No instructions available")
+			return
+		end
+
+		begin
+			if instructions.is_a?(Array)
+				instructions.each_with_index do |instruction, index|
+					next if control_character?(instruction)
 					position = index + 1
 					Instruction.create!(position: position, description: instruction, recipe_id: recipe_id)
 				end
-			else
-				Instruction.create!(position: 1, description: instructions, recipe_id: recipe_id)
+			elsif instructions.is_a?(String)
+				if instructions.match?(/\n/)
+					instructions.split("\n").each_with_index do |instruction, index|
+						next if control_character?(instruction)
+						position = index + 1
+						Instruction.create!(position: position, description: instruction, recipe_id: recipe_id)
+					end
+				else
+					return if control_character?(instruction)
+					Instruction.create!(position: 1, description: instructions, recipe_id: recipe_id)
+				end
 			end
+
+			@logger.info("Successfully got instructions")
+		rescue StandardError => e
+			@logger.info("Error: could not add instructions: #{e}")
+			raise e
 		end
 	end
 
@@ -101,7 +132,7 @@ class WebpageCrawler
 	end
 
 	def minimum_params_are_present?(params)
-		if params[:name] && params[:image] && params[:recipeIngredient] && params[:recipeInstructions]
+		if params[:name] && params[:image] && params[:recipeIngredient]
 			true
 		else 
 			false
@@ -114,5 +145,18 @@ class WebpageCrawler
 
 	def recipe_exists?(url)
 		Recipe.where(recipe_url: url).any?
+	end
+
+	def control_character?(string)
+		["\n", "\r", "\t", "\r\n"].include?(string)
+	end
+
+	def handle_mutiple_images(recipe_hash)
+		if recipe_hash[:image].is_a?(Array)
+			recipe_hash[:image] = recipe_hash[:image].first
+			recipe_hash
+		else
+			recipe_hash
+		end
 	end
 end
