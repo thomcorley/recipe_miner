@@ -5,7 +5,7 @@ class Recipe < ApplicationRecord
 
 	validates_uniqueness_of :recipe_url 
 
-	after_save :check_for_amp_version
+	before_save :check_for_amp_version
 
 	def check_for_amp_version
 		last_recipe_url = Recipe.last.recipe_url

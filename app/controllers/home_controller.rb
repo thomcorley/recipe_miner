@@ -5,7 +5,7 @@ class HomeController < ApplicationController
   end
 
   def start_mining
-  	RecipeMiner.start_mining
+  	RecipeMinerJob.schedule
   	flash[:notice] = "Started mining for recipes!"
   	redirect_to "/"
   end
