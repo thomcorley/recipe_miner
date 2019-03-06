@@ -1,5 +1,4 @@
-class HomeController < ApplicationController
-	
+class HomeController < ApplicationController	
   def index
   	@recipe_count = Recipe.all.count
   end

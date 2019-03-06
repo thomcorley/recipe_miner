@@ -11,6 +11,7 @@ class WebpageCrawler
 		end
 		recipe_page = HTTParty.get(@url)
 
+
 		# Grab all the script elements in the page and loop through them
 		script_elements = Nokogiri(recipe_page.body).css("script")
 
@@ -47,14 +48,12 @@ class WebpageCrawler
 	def parse_recipe_json(json_content)
 		recipe_hash = json_content.deep_symbolize_keys
 
-		begin
-			recipe = save_recipe(recipe_hash)
-			save_ingredients(recipe_hash, recipe.id)
-			save_instructions(recipe_hash, recipe.id)
-		rescue StandardError => e
-			raise e
-			@logger.info("Error: Could not add recipe: #{e}")
-		end
+		recipe = save_recipe(recipe_hash)
+		save_ingredients(recipe_hash, recipe.id)
+		save_instructions(recipe_hash, recipe.id)
+	rescue StandardError => e
+		raise e
+		@logger.info("Error: Could not add recipe: #{e}")
 	end
 
 	# `recipe_hash` is the json content of the recipe
@@ -62,7 +61,7 @@ class WebpageCrawler
 	def save_recipe(recipe_hash)
 		raise "Missing essential recipe information" unless minimum_params_are_present?(recipe_hash)
 
-		recipe_hash = handle_mutiple_images(recipe_hash)
+		recipe_hash = process_image_url(recipe_hash)
 
 		formatted_recipe_params = sanitize_recipe_params(recipe_hash).merge(recipe_url: @url)
 		
@@ -151,9 +150,14 @@ class WebpageCrawler
 		["\n", "\r", "\t", "\r\n"].include?(string)
 	end
 
-	def handle_mutiple_images(recipe_hash)
-		if recipe_hash[:image].is_a?(Array)
-			recipe_hash[:image] = recipe_hash[:image].first
+	def process_image_url(recipe_hash)
+		img = recipe_hash[:image]
+
+		if img.is_a?(Array)
+			recipe_hash[:image] = img.first
+			recipe_hash
+		elsif img.is_a?(Hash) && img[:@type] == "ImageObject"
+			recipe_hash[:image] = img[:url]
 			recipe_hash
 		else
 			recipe_hash
