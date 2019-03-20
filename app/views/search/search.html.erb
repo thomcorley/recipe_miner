@@ -2,23 +2,42 @@
 <div class="notice"><%= flash[:notice] %></div>
 <% end %>
 
+<div class="pure-menu pure-menu-horizontal header">
+    <!-- <a href="#" class="pure-menu-heading pure-menu-link">BRAND</a> -->
+    <ul class="pure-menu-list">
+<!--         <li class="pure-menu-item"><a href="#" class="pure-menu-link">News</a></li>
+        <li class="pure-menu-item"><a href="#" class="pure-menu-link">Sports</a></li>
+        <li class="pure-menu-item"><a href="#" class="pure-menu-link">Finance</a></li> -->
+    </ul>
+</div>
+
 <div class="pure-g">
-  <div class="pure-u-1-1" style="text-align: center">
-    <h1><%= link_to("Recipe Miner", "/") %></h1>
-    <%= form_tag("/search", method: "get", class: "pure-form") do %>
-      <%= search_field_tag("search", "", class: "pure-form") %>
-      <%= submit_tag("Go", class: "pure-button pure-button-primary") %>
-    <% end %>
+  <div class="pure-u-1-1">
+    <div class="title-searchbar">
+      <h1><%= link_to("RecipeMiner", "/") %></h1>
+      <div class="searchbar">
+        <%= form_tag("/search", method: "get", class: "pure-form") do %>
+          <%= search_field_tag("search", "", class: "pure-form") %>
+      </div>
+      <div class="submit-button">
+          <%= submit_tag("Search", class: "pure-button pure-button-primary") %>
+        <% end %>
+      </div>
+    </div>
 
     <br><br>
+    <% if @recipes %>
+      <% @recipes.each do |recipe| %>
+        <div class="recipe-panel">
+          <div class="recipe-image">
+            <img src="<%= recipe.image_url %>" alt="<%= recipe.title %> image" height="50">
+          </div>
+          <div class="recipe-summary">
+            <%= recipe.title %>
+          </div>
 
-    <% @recipes.each do |recipe| %>
-    <div class="recipe-panel">
-      <img src="<%= recipe.image_url %>" alt="<%= recipe.title %> image" height="50">
-      <%= recipe.title %><br>
-      <%= link_to(recipe.recipe_url, recipe.recipe_url) %>
-      <br><br>
-    </div>
-    <% end  %>
+        </div>
+      <% end  %>
+    <% end %>
   </div>
 </div>

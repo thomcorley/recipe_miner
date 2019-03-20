@@ -4,8 +4,6 @@ class SearchController < ApplicationController
   	if search_params
   		ingredient = search_params.gsub(" ","").split(",")
   		@recipes = Recipe.joins(:ingredients).where("ingredients.description LIKE ?", "%#{ingredient.first}%").uniq
-  	else
-  		@recipes = Recipe.last(5)
   	end
   end
 
