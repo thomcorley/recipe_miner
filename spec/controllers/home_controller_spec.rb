@@ -16,4 +16,21 @@ RSpec.describe HomeController, type: :controller do
 			expect(assigns(:recipe_count)).to be_a(Integer)
 		end
 	end
+
+	describe "GET start_mining" do
+		it "schedules a RecipeMinerJob" do
+			expect(RecipeMinerJob).to receive(:schedule)
+			get :start_mining
+		end
+
+		it "displays a flash message" do
+			get :start_mining
+			expect(flash[:notice]).to be_present
+		end
+
+		it "redirects to the root url" do
+			get :start_mining
+			expect(response).to redirect_to("/")
+		end
+	end
 end
