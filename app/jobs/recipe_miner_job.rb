@@ -13,7 +13,7 @@ class RecipeMinerJob < Struct.new(:miner)
 			"#{Time.now}: [JOB] Started mining for recipes"
 		)
 
-		runtime = Benchmark.realtime do 
+		runtime = Benchmark.realtime do
 			RecipeMiner.start_mining
 		end
 
