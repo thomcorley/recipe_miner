@@ -1,17 +1,19 @@
 require 'rails_helper'
 
 RSpec.describe HomeController, type: :controller do
-	describe "#index" do
+	describe "GET index" do
+		before(:each) { get :index }
+
 		it "returns a 200" do
-			expect(response.code).to eq "200"
+			expect(response).to have_http_status(:ok)
 		end
 
-		it "renders the index view template" do
-			expect(response).to render_template(:new)
+		it "renders the index view" do
+			expect(response).to render_template("index")
 		end
 
-		it "instantiates a Recipe" do
-
+		it "assigns @recipe_count" do
+			expect(assigns(:recipe_count)).to be_a(Integer)
 		end
 	end
 end
