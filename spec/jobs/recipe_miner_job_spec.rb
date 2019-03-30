@@ -3,9 +3,10 @@
 require "rails_helper"
 
 RSpec.describe RecipeMinerJob, "#perform" do
-  it "performs successfully" do
-    expect(RecipeMiner).to receive(:start_mining)
+  let(:test_website_directory) { "lib/test_website_directory.txt" }
 
-    RecipeMinerJob.new.perform
+  it "performs successfully" do
+    expect_any_instance_of(RecipeMiner).to receive(:start_crawling_websites)
+    RecipeMinerJob.new(test_website_directory).perform
   end
 end
