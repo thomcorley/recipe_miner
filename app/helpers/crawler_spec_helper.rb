@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 module CrawlerSpecHelper
-	def read_test_file(path_to_file)
-		File.open(path_to_file, "r").read	 	
-	end
+  def read_test_file(path_to_file)
+    File.open(path_to_file, "r").read
+  end
 end

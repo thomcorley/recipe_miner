@@ -1551,9 +1551,16 @@ Style/YodaCondition:
   Description: Do not use literals as the first operand of a comparison.
   Reference: https://en.wikipedia.org/wiki/Yoda_conditions
   Enabled: true
-  EnforcedStyle: require_for_all_comparison_operators
+  EnforcedStyle: forbid_for_all_comparison_operators
   SupportedStyles:
-  - require_for_all_comparison_operators
+    # check all comparison operators
+    - forbid_for_all_comparison_operators
+    # check only equality operators: `!=` and `==`
+    - forbid_for_equality_operators_only
+    # enforce yoda for all comparison operators
+    - require_for_all_comparison_operators
+    # enforce yoda only for equality operators: `!=` and `==`
+    - require_for_equality_operators_only
 
 # Supports --auto-correct
 FactoryBot/AttributeDefinedStatically:

@@ -1,28 +1,32 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
-include CrawlerSpecHelper
 
 RSpec.describe WebpageCrawler, type: :model do
-	setup do
-		@crawler = WebpageCrawler.new("https://www.grubdaily.com/cavolo-nero-parmesan-salad")
-		json = read_test_file("spec/test_data/basic_recipe.json")
-		@recipe_hash = JSON.parse(json).deep_symbolize_keys
-	end
+
+  include CrawlerSpecHelper
+
+  setup do
+    @crawler = WebpageCrawler.new("https://www.grubdaily.com/cavolo-nero-parmesan-salad")
+    json = read_test_file("spec/test_data/basic_recipe.json")
+    @recipe_hash = JSON.parse(json).deep_symbolize_keys
+  end
 
   describe "#parse_recipe_json" do
     let(:parse_recipe) { @crawler.parse_recipe_json(@recipe_hash) }
 
     it "saves a recipe" do
-  		expect { parse_recipe }.to change { Recipe.count }.by 1
-	  end
+      expect { parse_recipe }.to change { Recipe.count }.by 1
+    end
   end
 
   describe "#save_recipe" do
-	  it "has the correct recipe url" do
-	  	recipe = @crawler.save_recipe(@recipe_hash)
-	  	correct_url = "https://www.grubdaily.com/cavolo-nero-parmesan-salad"
+    it "has the correct recipe url" do
+      recipe = @crawler.save_recipe(@recipe_hash)
+      correct_url = "https://www.grubdaily.com/cavolo-nero-parmesan-salad"
 
-	  	expect(recipe.recipe_url).to eq(correct_url)
-	  end
+      expect(recipe.recipe_url).to eq(correct_url)
+    end
 
     it "handles multiple images" do
       json = read_test_file("spec/test_data/recipe_with_multiple_images.json")
@@ -41,17 +45,17 @@ RSpec.describe WebpageCrawler, type: :model do
   end
 
   describe "#is_a_recipe_schema" do
-  	it "returns true for a valid recipe schema" do
-  		is_schema = @crawler.is_a_recipe_schema?("application/ld+json", "Recipe")
+    it "returns true for a valid recipe schema" do
+      is_schema = @crawler.is_a_recipe_schema?("application/ld+json", "Recipe")
 
-  		expect(is_schema).to be true
-	  end
+      expect(is_schema).to be true
+    end
 
-  	it "returns false for a schema of a different type" do
-  		is_schema = @crawler.is_a_recipe_schema?("application/ld+json", "Horse")
+    it "returns false for a schema of a different type" do
+      is_schema = @crawler.is_a_recipe_schema?("application/ld+json", "Horse")
 
-  		expect(is_schema).to be false
-	  end
+      expect(is_schema).to be false
+    end
   end
 
   describe "#save_ingredients" do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RemoveNullFalseFromRecipeDescriptionColumnAgain < ActiveRecord::Migration[5.1]
   def change
   	def change

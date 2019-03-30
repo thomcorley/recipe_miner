@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 class Ingredient < ApplicationRecord
-	belongs_to :recipe
+  belongs_to :recipe
 
-	validates_presence_of :position, :description
+  validates_presence_of :position, :description
 end
-
