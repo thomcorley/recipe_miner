@@ -3,11 +3,11 @@ class Recipe < ApplicationRecord
 	has_many :ingredients, dependent: :destroy
 	has_many :instructions, dependent: :destroy
 
-	validates_uniqueness_of :recipe_url 
+	validates_uniqueness_of :recipe_url
 
 	before_save :deduplicate_recipes_with_amp_versions
 
-	class AmpRecipeDetectedError < StandardError 
+	class AmpRecipeDetectedError < StandardError
 		def message
 			"Alternative AMP recipe detected, destroying self in favour of it"
 		end
@@ -16,7 +16,7 @@ class Recipe < ApplicationRecord
 	def deduplicate_recipes_with_amp_versions
 		if is_amp?
 			recipes = duplicate_recipes
-			
+
 			if recipes.any?
 				recipes.each(&:destroy)
 				Rails.logger.info("Other non-amp recipe(s) detected; removing")
