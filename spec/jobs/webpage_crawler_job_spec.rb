@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe WebsiteCrawlerJob, type: :job do
+RSpec.describe WebpageCrawlerJob, type: :job do
 
   describe "#perform" do
     let(:website_url) { "https://www.grubdaily.com" }
