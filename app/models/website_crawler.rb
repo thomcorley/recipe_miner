@@ -1,40 +1,27 @@
 # frozen_string_literal: true
 
 class WebsiteCrawler
-  def initialize(url)
+  def initialize(url: "https://www.grubdaily.com")
     @url = url
+    @logger = Rails.logger
   end
 
   def crawl
-    logger = Rails.logger
+    # Return early if there's no sitemap
+    return unless sitemap_response_code == "200"
 
-    sitemap_request = HTTParty.get(construct_url_from(@url) + "/sitemap.xml")
 
-    if sitemap_request.code != 200
-      logger.info("Could not crawl website: sitemap not available")
-      return
-    end
+    # Use the sitemap to generate a list of webpage urls
 
-    nokogiri_link_objects = get_links_from_sitemap(sitemap_request.body)
 
-    # Assuming that if there are less than 50 links in the sitemap
-    # its a sitemap of sitemaps and we have to loop through each link
-    if nokogiri_link_objects.count < 50
-      nokogiri_link_objects.each do |single_sitemap_object|
-        inner_sitemap = HTTParty.get(single_sitemap_object.text).body
-        inner_link_objects = get_links_from_sitemap(inner_sitemap)
+    # Loop through the list of urls and schedule a webpage crawler job for each
+  end
 
-        inner_link_objects.each do |inner_link_object|
-          url_of_webpage = inner_link_object.text
-          WebpageCrawlerJob.schedule(url_of_webpage)
-        end
-      end
-    else
-      nokogiri_link_objects.each do |link_object|
-        url_of_webpage = link_object.text
-        WebpageCrawlerJob.schedule(url_of_webpage)
-      end
-    end
+  private
+
+  def sitemap_response_code
+    url = construct_url_from(@url) + "/sitemap.xml"
+    HttpRequest::Get.new(url).code
   end
 
   # The url of the recipe website may have subdomains, query string params etc
@@ -46,7 +33,7 @@ class WebsiteCrawler
 
   # Takes the response `.body` from an HTTParty request to the sitemap
   def get_links_from_sitemap(sitemap_body)
-    # All of the `loc` elements in the sitemap are urls of the website's pages
+    # The `loc` elements in the sitemap are urls of the webpages
     Nokogiri(sitemap_body).css("loc")
   end
 end
