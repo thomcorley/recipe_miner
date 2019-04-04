@@ -523,7 +523,7 @@ Layout/ClosingParenthesisIndentation:
 Style/ColonMethodCall:
   Description: 'Do not use :: for method call.'
   StyleGuide: 'https://github.com/bbatsov/ruby-style-guide#double-colons'
-  Enabled: true
+  Enabled: false
 
 Style/CommandLiteral:
   Description: 'Use `` or %x around command literals.'

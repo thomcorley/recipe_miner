@@ -7,33 +7,25 @@ class WebsiteCrawler
   end
 
   def crawl
-    # Return early if there's no sitemap
-    return unless sitemap_response_code == "200"
+    if sitemap_response_code != 200
+      @logger.info("Could not crawl website: sitemap not available")
+      return
+    end
 
+    webpage_urls = SitemapParser.new(sitemap_url).array_of_urls
 
-    # Use the sitemap to generate a list of webpage urls
-
-
-    # Loop through the list of urls and schedule a webpage crawler job for each
+    webpage_urls.each do |url|
+      WebpageCrawlerJob.schedule(url)
+    end
   end
 
   private
 
   def sitemap_response_code
-    url = construct_url_from(@url) + "/sitemap.xml"
-    HttpRequest::Get.new(url).code
+    HttpRequest::Get.new(sitemap_url).code
   end
 
-  # The url of the recipe website may have subdomains, query string params etc
-  # so we want to extract only the plain url.
-  def construct_url_from(full_web_address)
-    uri = URI.parse(full_web_address.strip)
-    uri.scheme + "://" + uri.host
-  end
-
-  # Takes the response `.body` from an HTTParty request to the sitemap
-  def get_links_from_sitemap(sitemap_body)
-    # The `loc` elements in the sitemap are urls of the webpages
-    Nokogiri(sitemap_body).css("loc")
+  def sitemap_url
+    @url + "/sitemap.xml"
   end
 end
