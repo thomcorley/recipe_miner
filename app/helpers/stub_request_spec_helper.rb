@@ -12,4 +12,12 @@ module StubRequestSpecHelper
         }
       ).to_return(status: 200, body: "", headers: {})
   end
+
+  def grubdaily_url
+    "https://www.grubdaily.com"
+  end
+
+  def grubdaily_sitemap_url
+    "https://www.grubdaily_url/sitemap.xml"
+  end
 end

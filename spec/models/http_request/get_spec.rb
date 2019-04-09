@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 describe HttpRequest::Get do
+
+  # TODO: change this spec so it's not testing the class under test
+
   describe "#get" do
     let(:url) { "www.nonsensewebaddress.com" }
 

@@ -7,30 +7,47 @@ RSpec.describe WebsiteCrawler, type: :model do
   include StubRequestSpecHelper
 
   describe "#crawl" do
-    let!(:default_crawler) { WebsiteCrawler.new }
-    let(:default_url) { "https://www.grubdaily.com" }
+    let(:crawler) { WebsiteCrawler.new(url: grubdaily_url) }
 
     it "crawls grubdaily.com by default if no url is given" do
-      instance_variable = default_crawler.instance_variable_get(:@url)
+      crawler = WebsiteCrawler.new
+      instance_variable = crawler.instance_variable_get(:@url)
 
-      expect(instance_variable).to eq(default_url)
+      expect(instance_variable).to eq(grubdaily_url)
     end
 
     it "crawls a website if it has a sitemap" do
-      sitemap_url = default_url + "/sitemap.xml"
-      requester = HttpRequest::Get.new(sitemap_url)
+      requester = HttpRequest::Get.new(grubdaily_sitemap_url)
       urls = ["https://www.grubdaily.com/sourdough"]
 
-      stub_200_response_for(sitemap_url)
+      stub_200_response_for(grubdaily_sitemap_url)
       allow_any_instance_of(SitemapParser).to receive(:array_of_urls).and_return(urls)
+      allow_any_instance_of(HttpRequest::Get).to receive(:code).and_return(200)
 
       expect(WebpageCrawlerJob).to receive(:schedule).once
 
-      default_crawler.crawl
+      crawler.crawl
     end
 
-    it "doesn't crawl a website with no sitemap" do
-      # expect(WebpageCrawlerJob).not_to rece ive(:schedule)
+    context "crawling a website that doesn't have a sitemap" do
+      it "doesn't schedule a WebpageCrawlerJob" do
+        allow_any_instance_of(HttpRequest::Get).to receive(:code).
+          and_return(404)
+
+        expect(WebpageCrawlerJob).not_to receive(:schedule)
+
+        crawler.crawl
+      end
+
+      it "logs the correct message" do
+        logger = Rails.logger
+        allow_any_instance_of(HttpRequest::Get).to receive(:code).
+          and_return(404)
+
+        expect(logger).to receive(:info).with("Could not crawl website: sitemap not available")
+
+        crawler.crawl
+      end
     end
   end
 end
