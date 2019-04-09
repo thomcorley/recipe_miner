@@ -20,4 +20,8 @@ module StubRequestSpecHelper
   def grubdaily_sitemap_url
     "https://www.grubdaily_url/sitemap.xml"
   end
+
+  def stub_get_request_with(response)
+    allow_any_instance_of(HttpRequest::Get).to receive(:body).and_return(response)
+  end
 end

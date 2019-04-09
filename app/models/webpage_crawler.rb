@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class WebpageCrawler
-  def initialize(url, logger = Rails.logger)
+  def initialize(url)
     @url = url
-    @logger = logger
+    @logger = Rails.logger
   end
 
   def crawl
@@ -11,31 +11,11 @@ class WebpageCrawler
       @logger.info("Recipe already exists")
       return
     end
-    recipe_page = HTTParty.get(@url)
 
+    recipe_json = RecipeJsonFinder.new(@url).find
+    content = JSON.parse(recipe_json)
 
-    # Grab all the script elements in the page and loop through them
-    script_elements = Nokogiri(recipe_page.body).css("script")
-
-    # Putting this in a rescue block to handle the script elements
-    # that can't be parsed as JSON
-    json_elements = script_elements.select do |element|
-      element.attributes["type"]&.value == "application/ld+json"
-    end
-
-    json_elements.each do |json_element|
-      content = JSON.parse(json_element.text)
-
-      next if content.nil?
-
-      schema_is_for_a_recipe = is_a_recipe_schema?(json_element.attributes["type"].value, content["@type"])
-
-      if schema_is_for_a_recipe
-        parse_recipe_json(content)
-      else
-        @logger.info("JSON did not contain recipe data")
-      end
-    end
+    parse_recipe_json(content)
   end
 
   # There are many schemas which have the same script tag

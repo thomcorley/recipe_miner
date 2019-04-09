@@ -2,14 +2,26 @@
 
 require 'rails_helper'
 
-RSpec.describe WebpageCrawler, type: :model do
-
-  include CrawlerSpecHelper
+RSpec.describe WebpageCrawler do
 
   setup do
     @crawler = WebpageCrawler.new("https://www.grubdaily.com/cavolo-nero-parmesan-salad")
     file = File.read("spec/test_data/basic_recipe.json")
     @recipe_hash = JSON.parse(file).deep_symbolize_keys
+  end
+
+  describe "#crawl" do
+    context "for a webpage with JSON recipe schema" do
+      it "saves a recipe" do
+        stub_recipe_json = File.read("spec/test_data/basic_recipe.json")
+        allow_any_instance_of(RecipeJsonFinder).to receive(:find).and_return(stub_recipe_json)
+        expect{ @crawler.crawl }.to change{ Recipe.count }.by(1)
+
+        @crawler.crawl
+      end
+
+      it "handles multiple images"
+    end
   end
 
   describe "#parse_recipe_json" do
