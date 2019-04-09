@@ -8,8 +8,8 @@ RSpec.describe WebpageCrawler, type: :model do
 
   setup do
     @crawler = WebpageCrawler.new("https://www.grubdaily.com/cavolo-nero-parmesan-salad")
-    json = read_test_file("spec/test_data/basic_recipe.json")
-    @recipe_hash = JSON.parse(json).deep_symbolize_keys
+    file = File.read("spec/test_data/basic_recipe.json")
+    @recipe_hash = JSON.parse(file).deep_symbolize_keys
   end
 
   describe "#parse_recipe_json" do
@@ -29,7 +29,7 @@ RSpec.describe WebpageCrawler, type: :model do
     end
 
     it "handles multiple images" do
-      json = read_test_file("spec/test_data/recipe_with_multiple_images.json")
+      json = File.read("spec/test_data/recipe_with_multiple_images.json")
       recipe_hash = JSON.parse(json).deep_symbolize_keys
       recipe = @crawler.save_recipe(recipe_hash)
 
@@ -37,7 +37,7 @@ RSpec.describe WebpageCrawler, type: :model do
     end
 
     it "saves a recipe with no instructions" do
-      json = read_test_file("spec/test_data/recipe_with_no_instructions.json")
+      json = File.read("spec/test_data/recipe_with_no_instructions.json")
       recipe_hash = JSON.parse(json).deep_symbolize_keys
 
       expect { @crawler.save_recipe(recipe_hash) }.to change { Recipe.count }.by 1
