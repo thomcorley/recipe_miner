@@ -10,26 +10,32 @@ RSpec.describe WebpageCrawler do
 
   describe "#crawl" do
     context "for a webpage with JSON recipe schema" do
-      it "saves a recipe" do
-        stub_recipe_json = File.read("spec/test_data/basic_recipe.json")
+      let(:recipe) { create(:recipe) }
+      let(:stub_recipe_json) { stub_recipe_json = File.read("spec/test_data/basic_recipe.json") }
+
+      it "imports a recipe" do
         allow_any_instance_of(RecipeJsonFinder).to receive(:find).and_return(stub_recipe_json)
-        expect{ @crawler.crawl }.to change{ Recipe.count }.by(1)
+        allow_any_instance_of(IngredientsImporter).to receive(:import).and_return(true)
+
+        expect_any_instance_of(RecipeImporter).to receive(:import).and_return(recipe)
 
         @crawler.crawl
       end
 
-      it "saves ingredients" do
-        stub_recipe_json = File.read("spec/test_data/basic_recipe.json")
+      it "imports ingredients" do
         allow_any_instance_of(RecipeJsonFinder).to receive(:find).and_return(stub_recipe_json)
+        expect_any_instance_of(IngredientsImporter).to receive(:import)
 
-        expect{ @crawler.crawl }.to change{ Ingredient.count }.by(4)
+        @crawler.crawl
       end
 
-      it "saves instructions" do
-        stub_recipe_json = File.read("spec/test_data/basic_recipe.json")
+      it "imports instructions" do
         allow_any_instance_of(RecipeJsonFinder).to receive(:find).and_return(stub_recipe_json)
+        allow_any_instance_of(IngredientsImporter).to receive(:import).and_return(true)
 
-        expect{ @crawler.crawl }.to change{ Instruction.count }.by(2)
+        expect_any_instance_of(InstructionsImporter).to receive(:import)
+
+        @crawler.crawl
       end
     end
 
