@@ -6,8 +6,6 @@ RSpec.describe WebpageCrawler do
 
   setup do
     @crawler = WebpageCrawler.new("https://www.grubdaily.com/cavolo-nero-parmesan-salad")
-    file = File.read("spec/test_data/basic_recipe.json")
-    @recipe_hash = JSON.parse(file).deep_symbolize_keys
   end
 
   describe "#crawl" do
@@ -20,75 +18,39 @@ RSpec.describe WebpageCrawler do
         @crawler.crawl
       end
 
-      it "handles multiple images"
-    end
-  end
+      it "saves ingredients" do
+        stub_recipe_json = File.read("spec/test_data/basic_recipe.json")
+        allow_any_instance_of(RecipeJsonFinder).to receive(:find).and_return(stub_recipe_json)
 
-  describe "#parse_recipe_json" do
-    let(:parse_recipe) { @crawler.parse_recipe_json(@recipe_hash) }
+        expect{ @crawler.crawl }.to change{ Ingredient.count }.by(4)
+      end
 
-    it "saves a recipe" do
-      expect { parse_recipe }.to change { Recipe.count }.by 1
-    end
-  end
+      it "saves instructions" do
+        stub_recipe_json = File.read("spec/test_data/basic_recipe.json")
+        allow_any_instance_of(RecipeJsonFinder).to receive(:find).and_return(stub_recipe_json)
 
-  describe "#save_recipe" do
-    it "has the correct recipe url" do
-      recipe = @crawler.save_recipe(@recipe_hash)
-      correct_url = "https://www.grubdaily.com/cavolo-nero-parmesan-salad"
-
-      expect(recipe.recipe_url).to eq(correct_url)
+        expect{ @crawler.crawl }.to change{ Instruction.count }.by(2)
+      end
     end
 
-    it "handles multiple images" do
-      json = File.read("spec/test_data/recipe_with_multiple_images.json")
-      recipe_hash = JSON.parse(json).deep_symbolize_keys
-      recipe = @crawler.save_recipe(recipe_hash)
+    context "for a webpage without JSON recipe schema" do
+      it "doesn't save a recipe" do
+        allow_any_instance_of(RecipeJsonFinder).to receive(:find).
+          and_return(nil)
 
-      expect(recipe.image_url).to eq "https://s3.eu-west-2.amazonaws.com/grubdaily/lamb_bolognese.jpg"
-    end
+        expect{ @crawler.crawl }.not_to change{ Recipe.count }
 
-    it "saves a recipe with no instructions" do
-      json = File.read("spec/test_data/recipe_with_no_instructions.json")
-      recipe_hash = JSON.parse(json).deep_symbolize_keys
+        @crawler.crawl
+      end
 
-      expect { @crawler.save_recipe(recipe_hash) }.to change { Recipe.count }.by 1
-    end
-  end
+      it "logs a message" do
+        allow_any_instance_of(RecipeJsonFinder).to receive(:find).
+          and_return(nil)
 
-  describe "#is_a_recipe_schema" do
-    it "returns true for a valid recipe schema" do
-      is_schema = @crawler.is_a_recipe_schema?("application/ld+json", "Recipe")
+        expect(Rails.logger).to receive(:info).with("Couldn't find a recipe in this webpage")
 
-      expect(is_schema).to be true
-    end
-
-    it "returns false for a schema of a different type" do
-      is_schema = @crawler.is_a_recipe_schema?("application/ld+json", "Horse")
-
-      expect(is_schema).to be false
-    end
-  end
-
-  describe "#save_ingredients" do
-    let(:recipe) { FactoryBot.create(:recipe) }
-    let(:webpage_crawler) { WebpageCrawler.new("https://www.grubdaily.com/classic-omelette.jpg") }
-
-    it "handles an array of ingredients" do
-      webpage_crawler.save_ingredients(@recipe_hash, recipe.id)
-      expect(recipe.reload.ingredients.count).to eq 4
-    end
-  end
-
-  describe "#save_instructions" do
-    let(:recipe) { FactoryBot.create(:recipe) }
-    let(:webpage_crawler) { WebpageCrawler.new("https://www.grubdaily.com/classic-omelette.jpg") }
-
-    it "parses instructions separated by newline characters" do
-      @recipe_hash[:recipeInstructions] = "Instructions separated\nby newline\ncharacters"
-      webpage_crawler.save_instructions(@recipe_hash, recipe.id)
-
-      expect(recipe.reload.instructions.count).to eq 3
+        @crawler.crawl
+      end
     end
   end
 end

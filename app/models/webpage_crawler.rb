@@ -13,10 +13,16 @@ class WebpageCrawler
     end
 
     recipe_json = RecipeJsonFinder.new(@url).find
-    content = JSON.parse(recipe_json)
 
-    parse_recipe_json(content)
+    if recipe_json
+      recipe_hash = JSON.parse(recipe_json)
+      process_recipe(recipe_hash)
+    else
+      @logger.info("Couldn't find a recipe in this webpage")
+    end
   end
+
+  private
 
   # There are many schemas which have the same script tag
   # of `application/ld+json` but we only want the ones of type "Recipe"
@@ -27,8 +33,8 @@ class WebpageCrawler
 
   # Parses the recipe json from the page
   # and saves it to the database
-  def parse_recipe_json(json_content)
-    recipe_hash = json_content.deep_symbolize_keys
+  def process_recipe(recipe_hash)
+    recipe_hash = recipe_hash.deep_symbolize_keys
 
     recipe = save_recipe(recipe_hash)
     save_ingredients(recipe_hash, recipe.id)
