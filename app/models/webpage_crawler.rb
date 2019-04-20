@@ -3,6 +3,7 @@
 class WebpageCrawler
   attr_reader :recipe_hash
 
+  # TODO: make this class more general: it should not know about the format of the keys of the recipe_hash
   def initialize(url)
     @url = url
     @logger = Rails.logger
@@ -14,10 +15,9 @@ class WebpageCrawler
       return
     end
 
-    recipe_json = RecipeJsonFinder.new(@url).find
+    @recipe_hash = RecipeFinder::JSONSchema.new(@url).recipe_hash
 
-    if recipe_json
-      @recipe_hash = JSON.parse(recipe_json)
+    if recipe_hash
       process_recipe
     else
       @logger.info("Couldn't find a recipe in this webpage")

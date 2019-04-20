@@ -11,10 +11,10 @@ RSpec.describe WebpageCrawler do
   describe "#crawl" do
     context "for a webpage with JSON recipe schema" do
       let(:recipe) { create(:recipe) }
-      let(:stub_recipe_json) { stub_recipe_json = File.read("spec/test_data/basic_recipe.json") }
+      let(:stub_recipe_hash) { stub_recipe_json = JSON.parse(File.read("spec/test_data/basic_recipe.json")) }
 
       it "imports a recipe" do
-        allow_any_instance_of(RecipeJsonFinder).to receive(:find).and_return(stub_recipe_json)
+        allow_any_instance_of(RecipeFinder::JSONSchema).to receive(:recipe_hash).and_return(stub_recipe_hash)
         allow_any_instance_of(IngredientsImporter).to receive(:import).and_return(true)
 
         expect_any_instance_of(RecipeImporter).to receive(:import).and_return(recipe)
@@ -23,14 +23,14 @@ RSpec.describe WebpageCrawler do
       end
 
       it "imports ingredients" do
-        allow_any_instance_of(RecipeJsonFinder).to receive(:find).and_return(stub_recipe_json)
+        allow_any_instance_of(RecipeFinder::JSONSchema).to receive(:recipe_hash).and_return(stub_recipe_hash)
         expect_any_instance_of(IngredientsImporter).to receive(:import)
 
         @crawler.crawl
       end
 
       it "imports instructions" do
-        allow_any_instance_of(RecipeJsonFinder).to receive(:find).and_return(stub_recipe_json)
+        allow_any_instance_of(RecipeFinder::JSONSchema).to receive(:recipe_hash).and_return(stub_recipe_hash)
         allow_any_instance_of(IngredientsImporter).to receive(:import).and_return(true)
 
         expect_any_instance_of(InstructionsImporter).to receive(:import)
@@ -41,7 +41,7 @@ RSpec.describe WebpageCrawler do
 
     context "for a webpage without JSON recipe schema" do
       it "doesn't save a recipe" do
-        allow_any_instance_of(RecipeJsonFinder).to receive(:find).
+        allow_any_instance_of(RecipeFinder::JSONSchema).to receive(:recipe_hash).
           and_return(nil)
 
         expect{ @crawler.crawl }.not_to change{ Recipe.count }
@@ -50,7 +50,7 @@ RSpec.describe WebpageCrawler do
       end
 
       it "logs a message" do
-        allow_any_instance_of(RecipeJsonFinder).to receive(:find).
+        allow_any_instance_of(RecipeFinder::JSONSchema).to receive(:recipe_hash).
           and_return(nil)
 
         expect(Rails.logger).to receive(:info).with("Couldn't find a recipe in this webpage")

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class RecipeImporter
-
+  # TODO: make this class more general: it should accept params in only one format
   def initialize(recipe_hash)
     @recipe_hash = recipe_hash
   end
