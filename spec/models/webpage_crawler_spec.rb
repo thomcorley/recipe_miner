@@ -22,6 +22,8 @@ RSpec.describe WebpageCrawler do
         @crawler.crawl
       end
 
+      it "doesn't import a recipe if it exists already"
+
       it "imports ingredients" do
         allow_any_instance_of(RecipeFinder::JSONSchema).to receive(:recipe_hash).and_return(stub_recipe_hash)
         expect_any_instance_of(IngredientsImporter).to receive(:import)

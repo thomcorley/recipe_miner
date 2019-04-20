@@ -10,7 +10,7 @@ class WebpageCrawler
   end
 
   def crawl
-    if recipe_exists?(@url)
+    if recipe_exists?
       @logger.info("Recipe already exists")
       return
     end
@@ -26,8 +26,8 @@ class WebpageCrawler
 
   private
 
-  def recipe_exists?(url)
-    Recipe.where(recipe_url: url).any?
+  def recipe_exists?
+    Recipe.where(recipe_url: @url).any?
   end
 
   def process_recipe
