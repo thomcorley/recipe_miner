@@ -2,10 +2,12 @@
 
 FactoryBot.define do
   factory :recipe do
-    title { "Lamb Bolognese" }
-    image_url { "https://s3.eu-west-2.amazonaws.com/grubdaily/lamb_bolognese.jpg" }
-    total_time { "PT3H" }
-    description { "Bolognese made with lamb mince instead of beef is much more flavoursome." }
-    recipe_url { "https://www.grubdaily.com/lamb-bolognese" }
+    title { "Onion Soup" }
+    image_url { "https://www.grubdaily.com/onion-soup.jpg" }
+    total_time { "PT4H" }
+    rating_value { 5 }
+    rating_count { 60 }
+    description { "A french classic" }
+    recipe_url { "https://www.grubdaily.com/onion-soup" }
   end
 end

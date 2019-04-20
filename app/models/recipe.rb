@@ -9,6 +9,19 @@ class Recipe < ApplicationRecord
 
   before_save :deduplicate_recipes_with_amp_versions
 
+  FULL_ATTRIBUTES = [
+    :title,
+    :image_url,
+    :total_time,
+    :yield,
+    :description,
+    :rating_value,
+    :rating_count,
+    :recipe_url,
+    :ingredients,
+    :instructions
+  ]
+
   class AmpRecipeDetectedError < StandardError
     def message
       "Alternative AMP recipe detected, destroying self in favour of it"

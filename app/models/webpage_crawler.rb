@@ -3,21 +3,21 @@
 class WebpageCrawler
   attr_reader :recipe_hash
 
+  # TODO: make this class more general: it should not know about the format of the keys of the recipe_hash
   def initialize(url)
     @url = url
     @logger = Rails.logger
   end
 
   def crawl
-    if recipe_exists?(@url)
+    if recipe_exists?
       @logger.info("Recipe already exists")
       return
     end
 
-    recipe_json = RecipeJsonFinder.new(@url).find
+    @recipe_hash = RecipeFinder::JSONSchema.new(@url).recipe_hash
 
-    if recipe_json
-      @recipe_hash = JSON.parse(recipe_json)
+    if recipe_hash
       process_recipe
     else
       @logger.info("Couldn't find a recipe in this webpage")
@@ -26,8 +26,8 @@ class WebpageCrawler
 
   private
 
-  def recipe_exists?(url)
-    Recipe.where(recipe_url: url).any?
+  def recipe_exists?
+    Recipe.where(recipe_url: @url).any?
   end
 
   def process_recipe
@@ -40,17 +40,17 @@ class WebpageCrawler
   end
 
   def import_recipe
-    formatted_recipe_hash = recipe_hash.deep_symbolize_keys.merge(recipe_url: @url)
-    RecipeImporter.new(formatted_recipe_hash).import
+    params = recipe_hash.except(:ingredients, :instructions)
+    Recipe.create!(params)
   end
 
   def import_ingredients(recipe_id:)
-    ingredients = recipe_hash[:recipeIngredient]
+    ingredients = recipe_hash[:ingredients]
     IngredientsImporter.new(ingredients, recipe_id).import
   end
 
   def import_instructions(recipe_id:)
-    instructions = recipe_hash[:recipeInstructions]
+    instructions = recipe_hash[:instructions]
     InstructionsImporter.new(instructions, recipe_id).import
   end
 end
