@@ -37,28 +37,3 @@ RSpec.describe SitemapParser do
     end
   end
 end
-
-
-
-# TODO: clean below
-
-# nokogiri_link_objects = get_links_from_sitemap(sitemap_response.body)
-
-# # Assuming that if there are less than 50 links in the sitemap
-# # its a sitemap of sitemaps and we have to loop through each link
-# if nokogiri_link_objects.count < 50
-#   nokogiri_link_objects.each do |single_sitemap_object|
-#     inner_sitemap = HTTParty.get(single_sitemap_object.text).body
-#     inner_link_objects = get_links_from_sitemap(inner_sitemap)
-
-#     inner_link_objects.each do |inner_link_object|
-#       url_of_webpage = inner_link_object.text
-#       WebpageCrawlerJob.schedule(url_of_webpage)
-#     end
-#   end
-# else
-#   nokogiri_link_objects.each do |link_object|
-#     url_of_webpage = link_object.text
-#     WebpageCrawlerJob.schedule(url_of_webpage)
-#   end
-# end

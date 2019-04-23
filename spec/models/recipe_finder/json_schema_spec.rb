@@ -3,7 +3,7 @@
 RSpec.describe RecipeFinder::JSONSchema do
   include StubRequestSpecHelper
 
-  describe "#find" do
+  describe "#recipe_hash" do
     before(:each) do
       @finder = RecipeFinder::JSONSchema.new(grubdaily_url)
     end
