@@ -9,13 +9,6 @@ RSpec.describe WebsiteCrawler, type: :model do
   describe "#crawl" do
     let(:crawler) { WebsiteCrawler.new(url: grubdaily_url) }
 
-    it "crawls grubdaily.com by default if no url is given" do
-      crawler = WebsiteCrawler.new
-      instance_variable = crawler.instance_variable_get(:@url)
-
-      expect(instance_variable).to eq(grubdaily_url)
-    end
-
     it "crawls a website if it has a sitemap" do
       requester = HttpRequest::Get.new(grubdaily_sitemap_url)
       urls = ["https://www.grubdaily.com/sourdough"]
