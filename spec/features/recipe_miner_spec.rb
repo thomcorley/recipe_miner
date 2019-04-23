@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.feature "Successfully mining webpages" do
+RSpec.feature "RecipeMiner" do
   include StubRequestSpecHelper
 
   let(:grubdaily_webpage) { File.read("spec/test_data/recipe_webpage_full.html") }

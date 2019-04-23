@@ -31,7 +31,7 @@ class SitemapParser
 
       sitemap_link_objects.each do |obj|
         xml_of_urls = HttpRequest::Get.new(obj.text).body
-        urls << Nokogiri(xml).css("loc").map(&:text)
+        urls << Nokogiri(xml_of_urls).css("loc").map(&:text)
       end
 
       urls.flatten
