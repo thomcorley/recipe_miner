@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class WebsiteCrawler
-  def initialize(url: "https://www.grubdaily.com")
+  def initialize(url:)
     @url = url
     @logger = Rails.logger
   end

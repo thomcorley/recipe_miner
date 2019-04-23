@@ -3,7 +3,7 @@
 class RecipeMinerJob < Struct.new(:directory)
   def self.schedule
     Delayed::Job.enqueue(
-      new("Recipe Miner"),
+      new("lib/website_directory.txt"),
       priority: 0
     )
   end

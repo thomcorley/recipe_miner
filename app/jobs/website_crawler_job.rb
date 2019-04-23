@@ -16,7 +16,7 @@ class WebsiteCrawlerJob < Struct.new(:website_url)
     )
 
     runtime = Benchmark.realtime do
-      WebsiteCrawler.new(website_url).crawl
+      WebsiteCrawler.new(url: website_url).crawl
     end
 
     formatted_runtime = sprintf("%.4f", runtime)

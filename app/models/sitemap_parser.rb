@@ -3,11 +3,11 @@
 class SitemapParser
   def initialize(sitemap)
     @sitemap = sitemap
+    @logger = Rails.logger
   end
 
   def array_of_urls
     if sitemap_is_url?
-      # assuming that the sitemap is XML, not some other format (JSON?)
       xml = HttpRequest::Get.new(@sitemap).body
       parse_xml(xml)
     else
@@ -21,13 +21,26 @@ class SitemapParser
     @sitemap =~ URI::regexp && !(@sitemap =~ /\n/)
   end
 
-  # Assuming that if there are less than 50 links in the sitemap its a sitemap of sitemaps
-  def is_a_sitemap_of_sitemaps?
-    array_of_urls < 20
+  def parse_xml(xml)
+    sitemap_link_objects = Nokogiri(xml).css("loc")
+
+    if is_a_sitemap_of_sitemaps?(sitemap_link_objects)
+      @logger.info("Sitemap of sitemaps detected")
+
+      urls = []
+
+      sitemap_link_objects.each do |obj|
+        xml_of_urls = HttpRequest::Get.new(obj.text).body
+        urls << Nokogiri(xml).css("loc").map(&:text)
+      end
+
+      urls.flatten
+    else
+      sitemap_link_objects.map(&:text)
+    end
   end
 
-  def parse_xml(xml)
-    link_objects = Nokogiri(xml).css("loc")
-    link_objects.map(&:text)
+  def is_a_sitemap_of_sitemaps?(sitemap_urls)
+    sitemap_urls.count < 20
   end
 end

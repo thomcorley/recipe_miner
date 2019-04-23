@@ -3,13 +3,13 @@
 class RecipeMiner
   require "httparty"
 
-  def initialize(args)
+  def initialize(args = {})
     args = defaults.merge(args)
     @website_directory = args[:directory]
   end
 
   def start_crawling_websites
-    website_urls.each do |website_url|
+    array_of_website_urls.each do |website_url|
       next unless has_sitemap?(website_url)
 
       WebsiteCrawlerJob.schedule(website_url)
@@ -30,10 +30,10 @@ class RecipeMiner
     uri.scheme + "://" + uri.host
   end
 
-  def website_urls
+  def array_of_website_urls
     raise "RecipeMiner: website directory must be provided" unless @website_directory
 
-    recipe_websites = File.open(@website_directory, "r")
+    File.read(@website_directory).split("\n")
   end
 
   def defaults
