@@ -12,7 +12,7 @@ module RecipeFinder
 
       {
         title: title,
-        image_url: nil,
+        image_url: image_url,
         total_time: total_time,
         yield: nil,
         description: nil,
@@ -31,16 +31,26 @@ module RecipeFinder
     end
 
     def total_time
-      prep_time_xpath = "//header/div[2]/div[2]/div/section[1]/div/span[1]/span"
-      prep_time = Nokogiri(webpage_body).xpath(prep_time_xpath).text.gsub(/\D/, "").to_i
-
-      cook_time_hour_xpath = "//header/div[2]/div[2]/div/section[1]/div/span[2]/span[1]"
-      cook_time_hour = Nokogiri(webpage_body).xpath(cook_time_hour_xpath).text.gsub(/\D/, "").to_i
-
-      cook_time_minute_xpath = "//header/div[2]/div[2]/div/section[1]/div/span[2]/span[2]"
-      cook_time_minute = Nokogiri(webpage_body).xpath(cook_time_minute_xpath).text.gsub(/\D/, "").to_i
+      prep_time = Nokogiri(webpage_body).xpath(xpaths[:prep_time]).text.gsub(/\D/, "").to_i
+      cook_time_hour = Nokogiri(webpage_body).xpath(xpaths[:cook_time_hour]).text.gsub(/\D/, "").to_i
+      cook_time_minute = Nokogiri(webpage_body).xpath(xpaths[:cook_time_minute]).text.gsub(/\D/, "").to_i
 
       (prep_time*60) + (cook_time_hour*3600) + (cook_time_minute*60)
+    end
+
+    def image_url
+      image_section = Nokogiri(webpage_body).xpath(xpaths[:image_url])
+      image_url = image_section.first.attributes["src"].value
+      image_url = image_url.prepend("https:")
+    end
+
+    def xpaths
+      {
+        prep_time: "//header/div[2]/div[2]/div/section[1]/div/span[1]/span",
+        cook_time_hour: "//header/div[2]/div[2]/div/section[1]/div/span[2]/span[1]",
+        cook_time_minute: "//header/div[2]/div[2]/div/section[1]/div/span[2]/span[2]",
+        image_url: "//header/div[1]/div/img"
+      }
     end
   end
 end
