@@ -19,7 +19,7 @@ module RecipeFinder
         description: description,
         rating_value: rating_value,
         rating_count: rating_count,
-        recipe_url: nil,
+        recipe_url: @url,
         ingredients: ingredients,
         instructions: instructions
       }

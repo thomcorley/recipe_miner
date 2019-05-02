@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "rails_helper"
+
 RSpec.feature "RecipeMiner" do
   include StubRequestSpecHelper
 
@@ -27,11 +29,11 @@ RSpec.feature "RecipeMiner" do
   end
 
   it "mines bbcgoodfood successfully" do
-    pending("this is a work in progress")
     stub_get_request_with(bbcgoodfood_webpage)
-    WebpageCrawler.new("https://www.bbcgoodfood.com")
+    WebpageCrawler.new("https://www.bbcgoodfood.com").crawl
 
     expect(Recipe.count).to eq(1)
-    expect(Ingredient.count).to eq(11)
+    expect(Ingredient.count).to eq(3)
+    expect(Instruction.count).to eq(2)
   end
 end
