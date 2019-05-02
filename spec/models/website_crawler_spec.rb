@@ -3,7 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe WebsiteCrawler, type: :model do
-
   include StubRequestSpecHelper
 
   describe "#crawl" do

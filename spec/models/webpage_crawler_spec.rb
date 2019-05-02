@@ -7,10 +7,10 @@ RSpec.describe WebpageCrawler do
     @crawler = WebpageCrawler.new("https://www.grubdaily.com/onion-soup")
   end
 
+  before(:each) { Recipe.all.each(&:destroy) }
+
   describe "#crawl" do
     context "for a webpage with JSON recipe schema" do
-      let(:recipe) { create(:recipe) }
-
       it "imports a recipe" do
         allow_any_instance_of(RecipeFinder::JSONSchema).to receive(:recipe_hash).and_return(example_recipe_hash)
         expected_recipe_params = example_recipe_hash.except(:ingredients, :instructions)
@@ -48,6 +48,24 @@ RSpec.describe WebpageCrawler do
         expect(Rails.logger).to receive(:info).with("Couldn't find a recipe in this webpage")
 
         @crawler.crawl
+      end
+    end
+
+    context "selecting the correct recipe finder" do
+      it "selects BBCGoodFood finder for a bbcgoodfood url" do
+        bbc_goodfood_crawler = WebpageCrawler.new("https://www.bbcgoodfood.com")
+        allow_any_instance_of(HttpRequest::Get).to receive(:body).and_return("YES")
+        expect_any_instance_of(RecipeFinder::BBCGoodFood).to receive(:recipe_hash)
+
+        bbc_goodfood_crawler.crawl
+      end
+
+      it "selects JSONSchema finder for a grubdaily url" do
+        grubdaily_crawler = WebpageCrawler.new("https://www.grubdaily.com")
+        allow_any_instance_of(HttpRequest::Get).to receive(:body).and_return("YES")
+        expect_any_instance_of(RecipeFinder::JSONSchema).to receive(:recipe_hash)
+
+        grubdaily_crawler.crawl
       end
     end
   end

@@ -3,7 +3,6 @@
 class WebpageCrawler
   attr_reader :recipe_hash
 
-  # TODO: make this class more general: it should not know about the format of the keys of the recipe_hash
   def initialize(url)
     @url = url
     @logger = Rails.logger
@@ -15,7 +14,7 @@ class WebpageCrawler
       return
     end
 
-    @recipe_hash = RecipeFinder::JSONSchema.new(@url).recipe_hash
+    @recipe_hash = recipe_finder.recipe_hash
 
     if recipe_hash
       process_recipe
@@ -28,6 +27,16 @@ class WebpageCrawler
 
   def recipe_exists?
     Recipe.where(recipe_url: @url).any?
+  end
+
+  def recipe_finder
+    host = URI.parse(@url).host
+
+    if host =~ /bbcgoodfood.com/
+      RecipeFinder::BBCGoodFood.new(@url)
+    else
+      RecipeFinder::JSONSchema.new(@url)
+    end
   end
 
   def process_recipe

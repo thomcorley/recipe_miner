@@ -7,13 +7,10 @@ RSpec.feature "RecipeMiner" do
   let(:gordon_ramsay_webpage) { File.read("spec/test_data/gordon_ramsay_example_page.html") }
   let(:bbcgoodfood_webpage) { File.read("spec/test_data/bbcgoodfood_webpage.html") }
   let(:crawler) { WebpageCrawler.new("https://www.grubdaily.com/example") }
+  before(:each) { Recipe.all.each(&:destroy) }
 
   it "mines www.grubdaily.com successfully" do
     stub_get_request_with(grubdaily_webpage)
-    Recipe.all.each(&:destroy)
-
-    expect(Recipe.count).to eq(0)
-
     crawler.crawl
 
     expect(Recipe.count).to eq(1)
@@ -23,10 +20,6 @@ RSpec.feature "RecipeMiner" do
 
   it "mines www.gordonramsay.com successfully" do
     stub_get_request_with(gordon_ramsay_webpage)
-    Recipe.all.each(&:destroy)
-
-    expect(Recipe.count).to eq(0)
-
     crawler.crawl
 
     expect(Recipe.count).to eq(1)
@@ -34,12 +27,9 @@ RSpec.feature "RecipeMiner" do
   end
 
   it "mines bbcgoodfood successfully" do
+    pending("this is a work in progress")
     stub_get_request_with(bbcgoodfood_webpage)
-    Recipe.all.each(&:destroy)
-
-    expect(Recipe.count).to eq(0)
-
-    crawler.crawl
+    WebpageCrawler.new("https://www.bbcgoodfood.com")
 
     expect(Recipe.count).to eq(1)
     expect(Ingredient.count).to eq(11)
