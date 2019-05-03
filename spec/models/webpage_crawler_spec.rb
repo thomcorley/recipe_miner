@@ -18,7 +18,12 @@ RSpec.describe WebpageCrawler do
         expect{ @crawler.crawl }.to change{ Recipe.count }.by(1)
       end
 
-      it "doesn't import a recipe if it exists already"
+      it "doesn't import a recipe if it exists already" do
+        allow_any_instance_of(RecipeFinder::JSONSchema).to receive(:recipe_hash).and_return(example_recipe_hash)
+        FactoryBot.create(:recipe)
+
+        expect{ @crawler.crawl }.not_to change{ Recipe.count }
+      end
 
       it "imports ingredients" do
         allow_any_instance_of(RecipeFinder::JSONSchema).to receive(:recipe_hash).and_return(example_recipe_hash)
