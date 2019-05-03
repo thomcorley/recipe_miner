@@ -28,6 +28,16 @@ class Recipe < ApplicationRecord
     end
   end
 
+  def display_title
+    if title.length < 29
+      title
+    else
+      title.first(29) + "..."
+    end
+  end
+
+  private
+
   def deduplicate_recipes_with_amp_versions
     if is_amp?
       recipes = duplicate_recipes
@@ -45,8 +55,6 @@ class Recipe < ApplicationRecord
       end
     end
   end
-
-  private
 
   # Assuming that another recipe with the same title from the same website is the same recipe
   def duplicate_amp_recipes

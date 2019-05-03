@@ -29,13 +29,31 @@
     <% if @recipes %>
       <% @recipes.each do |recipe| %>
         <div class="recipe-panel">
-          <div class="recipe-image">
-            <img src="<%= recipe.image_url %>" alt="<%= recipe.title %> image" height="50">
-          </div>
-          <div class="recipe-summary">
-            <%= recipe.title %>
-          </div>
+          <a href="<%= recipe.recipe_url %>" title="<%= recipe.title %>" alt="<%= recipe.title %>">
+            <div class="link-div">
 
+              <div class="recipe-image">
+                <img src="<%= recipe.image_url %>" alt="<%= recipe.title %> image" height="50">
+              </div>
+
+              <div class="recipe-info">
+
+                <div class="recipe-title">
+                  <%= recipe.display_title %>
+                </div>
+
+                <div class="recipe-rating">
+                  Rating: <%= recipe.rating_value %>/5 <em>(<%= recipe.rating_count %> votes)</em>
+                </div>
+
+                <div class="recipe-total-time">
+                  Total Time: <%= recipe.total_time %>s
+                </div>
+
+              </div>
+
+            </div>
+          </a>
         </div>
       <% end  %>
     <% end %>
