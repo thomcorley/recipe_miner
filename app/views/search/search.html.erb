@@ -2,15 +2,6 @@
 <div class="notice"><%= flash[:notice] %></div>
 <% end %>
 
-<div class="pure-menu pure-menu-horizontal header">
-    <!-- <a href="#" class="pure-menu-heading pure-menu-link">BRAND</a> -->
-    <ul class="pure-menu-list">
-<!--         <li class="pure-menu-item"><a href="#" class="pure-menu-link">News</a></li>
-        <li class="pure-menu-item"><a href="#" class="pure-menu-link">Sports</a></li>
-        <li class="pure-menu-item"><a href="#" class="pure-menu-link">Finance</a></li> -->
-    </ul>
-</div>
-
 <div class="pure-g">
   <div class="pure-u-1-1">
     <div class="title-searchbar">
@@ -34,7 +25,7 @@
               <div class="link-div">
 
                 <div class="recipe-image">
-                  <img src="<%= recipe.image_url %>" alt="<%= recipe.title %> image" height="50">
+                  <img src="<%= recipe.image_url %>" alt="<%= recipe.title %> image" >
                 </div>
 
                 <div class="recipe-info">
@@ -45,6 +36,7 @@
 
                   <div class="recipe-rating">
                     <% if recipe.rating_value && recipe.rating_count  %>
+                      <%= image_tag("star.png") %>
                       Rating: <%= recipe.rating_value %>/5 <em>(<%= recipe.rating_count %> votes)</em>
                     <% end  %>
                   </div>
