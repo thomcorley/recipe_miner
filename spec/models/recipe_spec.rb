@@ -26,4 +26,30 @@ RSpec.describe Recipe, type: :model do
       expect{ recipe1.reload }.to raise_error ActiveRecord::RecordNotFound
     end
   end
+
+  describe "#human_readable_time" do
+    context "converting from ISO time format" do
+      let(:recipe) { FactoryBot.create(:recipe) }
+
+      it "handles days" do
+        recipe.update!(total_time: "P2D")
+        expect(recipe.human_readable_time).to eq("2 days")
+      end
+
+      it "handles hours" do
+        recipe.update!(total_time: "PT4H")
+        expect(recipe.human_readable_time).to eq("4 hours")
+      end
+
+      it "handles minutes" do
+        recipe.update!(total_time: "PT30M")
+        expect(recipe.human_readable_time).to eq("30 minutes")
+      end
+
+      it "handles hours and minutes" do
+        recipe.update!(total_time: "PT1H30M")
+        expect(recipe.human_readable_time).to eq("1 hour, 30 minutes")
+      end
+    end
+  end
 end

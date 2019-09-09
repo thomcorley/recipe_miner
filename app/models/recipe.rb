@@ -1,11 +1,15 @@
 # frozen_string_literal: true
+# rubocop:disable Metrics/CyclomaticComplexity
 
 class Recipe < ApplicationRecord
   AMP_REGEX = %r(\/amp([^a-zA-Z]|$|\s))
+  ISO_TIME_REGEX = %r(/P((?<days>\d)+D)?T?((?<hours>\d+)H)?((?<minutes>\d+)M)?((?<seconds>\d+)S)?/)
+
   has_many :ingredients, dependent: :destroy
   has_many :instructions, dependent: :destroy
 
   validates_uniqueness_of :recipe_url
+  validates_format_of :total_time, :with => ISO_TIME_REGEX
 
   before_save :deduplicate_recipes_with_amp_versions
 
@@ -35,6 +39,27 @@ class Recipe < ApplicationRecord
       title.first(29) + "..."
     end
   end
+
+  def human_readable_time
+    return unless total_time
+
+    match_data = ISO_TIME_REGEX.match(total_time)
+
+    days = match_data.named_captures["days"].to_i
+    hours = match_data.named_captures["hours"].to_i
+    minutes = match_data.named_captures["minutes"].to_i
+
+    if days && !hours && !minutes
+      "#{days}" + " day".pluralize(days)
+    elsif hours && !minutes
+      "#{hours}" + " hour".pluralize(hours)
+    elsif hours && minutes
+      "#{hours}" + " hour".pluralize(hours) + ", #{minutes}" + " minute".pluralize(minutes)
+    elsif minutes
+      "#{minutes}" + " minute".pluralize(minutes)
+    end
+  end
+
 
   private
 
@@ -71,3 +96,4 @@ class Recipe < ApplicationRecord
     recipe_url.match?(AMP_REGEX)
   end
 end
+# rubocop:enable Metrics/CyclomaticComplexity

@@ -15,7 +15,7 @@ RSpec.describe RecipeFinder::BbcGoodFood do
     end
 
     it "gets the recipe meta information" do
-      expect(recipe_hash[:total_time]).to eq(6600)
+      expect(recipe_hash[:total_time]).to eq("PT1H50M")
     end
 
     it "gets the image url" do
