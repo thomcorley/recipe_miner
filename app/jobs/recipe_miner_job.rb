@@ -16,7 +16,7 @@ class RecipeMinerJob < Struct.new(:directory)
     )
 
     runtime = Benchmark.realtime do
-      RecipeMiner.new(directory: directory).start_crawling_websites
+      RecipeMiner.new(directory: directory).start
     end
 
     formatted_runtime = sprintf("%.4f", runtime)

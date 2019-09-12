@@ -8,7 +8,7 @@ class RecipeMiner
     @website_directory = args[:directory]
   end
 
-  def start_crawling_websites
+  def start
     array_of_website_urls.each do |website_url|
       next unless has_sitemap?(website_url)
 
