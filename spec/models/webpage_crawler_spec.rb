@@ -20,7 +20,7 @@ RSpec.describe WebpageCrawler do
 
       it "doesn't import a recipe if it exists already" do
         allow_any_instance_of(RecipeFinder::JSONSchema).to receive(:recipe_hash).and_return(example_recipe_hash)
-        FactoryBot.create(:recipe)
+        @crawler.crawl
 
         expect{ @crawler.crawl }.not_to change{ Recipe.count }
       end
@@ -58,7 +58,7 @@ RSpec.describe WebpageCrawler do
 
     context "selecting the correct recipe finder" do
       it "selects BbcGoodFood finder for a BbcGoodFood url" do
-        bbc_goodfood_crawler = WebpageCrawler.new("https://www.BbcGoodFood.com")
+        bbc_goodfood_crawler = WebpageCrawler.new("https://www.bbcgoodfood.com")
         allow_any_instance_of(HttpRequest::Get).to receive(:body).and_return("YES")
         expect_any_instance_of(RecipeFinder::BbcGoodFood).to receive(:recipe_hash)
 

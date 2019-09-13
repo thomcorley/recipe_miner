@@ -3,7 +3,7 @@
 
 class Recipe < ApplicationRecord
   AMP_REGEX = %r(\/amp([^a-zA-Z]|$|\s))
-  ISO_TIME_REGEX = %r(/P((?<days>\d)+D)?T?((?<hours>\d+)H)?((?<minutes>\d+)M)?((?<seconds>\d+)S)?/)
+  ISO_TIME_REGEX = /P((?<days>\d)+D)?T?((?<hours>\d+)H)?((?<minutes>\d+)M)?((?<seconds>\d+)S)?/
 
   has_many :ingredients, dependent: :destroy
   has_many :instructions, dependent: :destroy
@@ -45,23 +45,42 @@ class Recipe < ApplicationRecord
 
     match_data = ISO_TIME_REGEX.match(total_time)
 
-    days = match_data.named_captures["days"].to_i
-    hours = match_data.named_captures["hours"].to_i
-    minutes = match_data.named_captures["minutes"].to_i
 
-    if days && !hours && !minutes
+    @days = match_data.named_captures["days"].to_i
+    @hours = match_data.named_captures["hours"].to_i
+    @minutes = match_data.named_captures["minutes"].to_i
+
+    if only_days?
       "#{days}" + " day".pluralize(days)
-    elsif hours && !minutes
+    elsif only_hours?
       "#{hours}" + " hour".pluralize(hours)
-    elsif hours && minutes
+    elsif hours_and_minutes?
       "#{hours}" + " hour".pluralize(hours) + ", #{minutes}" + " minute".pluralize(minutes)
-    elsif minutes
+    elsif only_minutes?
       "#{minutes}" + " minute".pluralize(minutes)
     end
   end
 
 
   private
+
+  attr_reader :days, :hours, :minutes
+
+  def only_days?
+    days > 0 && hours == 0 && minutes == 0
+  end
+
+  def only_hours?
+    hours > 0 && days == 0 && minutes == 0
+  end
+
+  def only_minutes?
+    minutes > 0 && days == 0 && hours == 0
+  end
+
+  def hours_and_minutes?
+    minutes > 0 && hours > 0 && days == 0
+  end
 
   def deduplicate_recipes_with_amp_versions
     if is_amp?
