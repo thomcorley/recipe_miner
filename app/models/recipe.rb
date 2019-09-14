@@ -33,11 +33,17 @@ class Recipe < ApplicationRecord
   end
 
   def display_title
-    if title.length < 29
+    if title.length < 28
       title
     else
-      title.first(29) + "..."
+      title.first(28) + "..."
     end
+  end
+
+  def ingredients_summary
+    summary = ingredients.map(&:description).join(" - ").first(145)
+
+    summary.length < 145 ? summary : summary + "..."
   end
 
   def human_readable_time
@@ -53,11 +59,11 @@ class Recipe < ApplicationRecord
     if only_days?
       "#{days}" + " day".pluralize(days)
     elsif only_hours?
-      "#{hours}" + " hour".pluralize(hours)
+      "#{hours}" + " hr".pluralize(hours)
     elsif hours_and_minutes?
-      "#{hours}" + " hour".pluralize(hours) + ", #{minutes}" + " minute".pluralize(minutes)
+      "#{hours}" + " hr".pluralize(hours) + " #{minutes}" + " min"
     elsif only_minutes?
-      "#{minutes}" + " minute".pluralize(minutes)
+      "#{minutes}" + " min"
     end
   end
 

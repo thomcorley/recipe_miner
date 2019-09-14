@@ -22,33 +22,33 @@
         <% @recipes.each do |recipe| %>
           <div class="recipe-panel">
             <a href="<%= recipe.recipe_url %>" title="<%= recipe.title %>" alt="<%= recipe.title %>">
-              <div class="link-div">
+              <div class="recipe-title">
+                <%= recipe.display_title %>
+              </div>
 
-                <div class="recipe-image">
-                  <img src="<%= recipe.image_url %>" alt="<%= recipe.title %> image" >
+              <div class="recipe-image">
+                <img src="<%= recipe.image_url %>" alt="<%= recipe.title %> image" >
+              </div>
+
+              <div class="recipe-info">
+                <div class="recipe-rating-and-time">
+                  <%= image_tag("star.png") %>
+                  <%= image_tag("star.png") %>
+                  <%= image_tag("star.png") %>
+                  <%= image_tag("star.png") %>
+                  <%= image_tag("star.png") %>
+                  <% if recipe.total_time  %>
+                    <%= recipe.human_readable_time %>
+                  <% end %>
                 </div>
 
-                <div class="recipe-info">
-
-                  <div class="recipe-title">
-                    <%= recipe.display_title %>
-                  </div>
-
-                  <div class="recipe-rating">
-                    <% if recipe.rating_value && recipe.rating_count  %>
-                      <%= image_tag("star.png") %>
-                      Rating: <%= recipe.rating_value %>/5 <em>(<%= recipe.rating_count %> votes)</em>
-                    <% end  %>
-                  </div>
-
-                  <div class="recipe-total-time">
-                    <% if recipe.total_time  %>
-                      Total Time: <%= recipe.human_readable_time %>
-                    <% end %>
-                  </div>
-
+                <div class="recipe-description">
+                  <%= recipe.ingredients_summary %>
                 </div>
 
+                <div class="recipe-url">
+                  <em><%= link_to(recipe.recipe_url) %></em>
+                </div>
               </div>
             </a>
           </div>
