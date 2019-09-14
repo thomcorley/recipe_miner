@@ -7,7 +7,7 @@ module RecipeFinder
       "@type",
       "name",
       "image",
-      "totalTime",
+      "cookTime",
       "recipeYield",
       "recipeIngredient",
     ]
@@ -73,7 +73,7 @@ module RecipeFinder
       {
         title: schema_hash["name"],
         image_url: schema_hash["image"],
-        total_time: schema_hash["totalTime"],
+        total_time: schema_hash["cookTime"],
         yield: schema_hash["recipeYield"],
         description: schema_hash["description"],
         recipe_url: @url,
