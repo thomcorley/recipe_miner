@@ -5,7 +5,10 @@ class SearchController < ApplicationController
     search_params = params[:search]
     if search_params
       ingredient = search_params.delete(" ","").split(",")
-      @recipes = Recipe.joins(:ingredients).where("ingredients.description LIKE ?", "%#{ingredient.first}%").uniq
+      @recipes = Recipe.joins(:ingredients)
+        .where("ingredients.description LIKE ?", "%#{ingredient.first}%")
+        .uniq
+        .first(20)
     end
   end
 
