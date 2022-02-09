@@ -1,17 +1,16 @@
 # frozen_string_literal: true
+require "rails_helper"
 
-RSpec.describe RecipeFinder::JSONSchema do
+describe RecipeFinder::JsonSchema do
   include StubRequestSpecHelper
 
   describe "#recipe_hash" do
     before(:each) do
-      @finder = RecipeFinder::JSONSchema.new(grubdaily_url)
+      @finder = RecipeFinder::JsonSchema.new(grubdaily_url)
     end
 
     it "raises an error if passed an invalid URL" do
-      recipe_webpage = File.read("spec/test_data/recipe_webpage_full.html")
-
-      expect{ RecipeFinder::JSONSchema.new("not_a_url").recipe_hash }.to raise_error("Invalid URL")
+      expect{ RecipeFinder::JsonSchema.new("not_a_url").recipe_hash }.to raise_error("Invalid URL")
     end
 
     context "for a webpage that contains recipe JSON" do
@@ -47,7 +46,7 @@ RSpec.describe RecipeFinder::JSONSchema do
           broken_webpage = File.read("spec/test_data/recipe_webpage_missing_json_keys.html")
           stub_get_request_with(broken_webpage)
 
-          expect{ @finder.recipe_hash }.to raise_error(RecipeFinder::JSONSchema::MissingRecipeAttributesError)
+          expect{ @finder.recipe_hash }.to raise_error(RecipeFinder::JsonSchema::MissingRecipeAttributesError)
         end
       end
     end
@@ -57,7 +56,7 @@ RSpec.describe RecipeFinder::JSONSchema do
         recipe_webpage = File.read("spec/test_data/webpage_with_no_recipe_json.html")
         stub_get_request_with(recipe_webpage)
 
-        expect{ @finder.recipe_hash }.to raise_error(RecipeFinder::JSONSchema::NoRecipeJsonFoundError)
+        expect{ @finder.recipe_hash }.to raise_error(RecipeFinder::JsonSchema::NoRecipeJsonFoundError)
       end
     end
 
@@ -66,7 +65,7 @@ RSpec.describe RecipeFinder::JSONSchema do
         recipe_webpage = File.read("spec/test_data/webpage_with_non_recipe_json.html")
         stub_get_request_with(recipe_webpage)
 
-        expect{ @finder.recipe_hash }.to raise_error(RecipeFinder::JSONSchema::NoRecipeJsonFoundError)
+        expect{ @finder.recipe_hash }.to raise_error(RecipeFinder::JsonSchema::NoRecipeJsonFoundError)
       end
     end
 
@@ -74,7 +73,7 @@ RSpec.describe RecipeFinder::JSONSchema do
       it "gets the first image" do
         recipe_webpage = File.read("spec/test_data/recipe_with_multiple_images.html")
         stub_get_request_with(recipe_webpage)
-        recipe_hash = RecipeFinder::JSONSchema.new(grubdaily_url).recipe_hash
+        recipe_hash = RecipeFinder::JsonSchema.new(grubdaily_url).recipe_hash
 
         expect(recipe_hash[:image_url])
           .to eq("https://s3.eu-west-2.amazonaws.com/grubdaily/cavolo-nero-parmesan-salad.jpg")
@@ -85,7 +84,7 @@ RSpec.describe RecipeFinder::JSONSchema do
       it "gets the url of the image correctly" do
         recipe_webpage = File.read("spec/test_data/recipe_webpage_with_image_object.html")
         stub_get_request_with(recipe_webpage)
-        recipe_hash = RecipeFinder::JSONSchema.new(grubdaily_url).recipe_hash
+        recipe_hash = RecipeFinder::JsonSchema.new(grubdaily_url).recipe_hash
 
         expect(recipe_hash[:image_url])
           .to eq("https://www.gordonramsay.com/whole-Chicken-1157.jpg")

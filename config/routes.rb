@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  get "search/search"
+  get "home/start_mining"
+  get "home/index"
+  get "start_mining", to: "home#start_mining"
+  get "search", to: "search#search"
 
-  # Defines the root path route ("/")
-  # root "articles#index"
+  root "home#index"
 end

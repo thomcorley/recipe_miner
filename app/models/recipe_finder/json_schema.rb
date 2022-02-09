@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 module RecipeFinder
-  class JSONSchema
+  class JsonSchema
     # Assumes there is only one recipe on the webpage
     MINIMUM_KEYS = [
       "@type",
       "name",
       "image",
-      "cookTime",
+      "totalTime",
       "recipeYield",
       "recipeIngredient",
     ]

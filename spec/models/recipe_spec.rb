@@ -48,7 +48,7 @@ RSpec.describe Recipe, type: :model do
 
       it "handles hours and minutes" do
         recipe.update!(total_time: "PT1H30M")
-        expect(recipe.human_readable_time).to eq("1 hour, 30 minutes")
+        expect(recipe.human_readable_time).to eq("1 hour 30 minutes")
       end
     end
   end

@@ -35,7 +35,7 @@ class WebpageCrawler
     if host =~ /bbcgoodfood.com/
       RecipeFinder::BbcGoodFood.new(@url)
     else
-      RecipeFinder::JSONSchema.new(@url)
+      RecipeFinder::JsonSchema.new(@url)
     end
   end
 

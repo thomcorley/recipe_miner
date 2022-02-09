@@ -20,8 +20,8 @@ RSpec.describe HomeController, type: :controller do
   end
 
   describe "GET start_mining" do
-    it "schedules a RecipeMinerJob" do
-      expect(RecipeMinerJob).to receive(:schedule)
+    it "schedules a MinerJob" do
+      expect(MinerJob).to receive(:schedule)
       get :start_mining
     end
 

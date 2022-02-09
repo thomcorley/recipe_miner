@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class RecipeMinerJob < Struct.new(:directory)
+class MinerJob < Struct.new(:directory)
   def self.schedule
     Delayed::Job.enqueue(
       new("lib/website_directory.txt"),
@@ -16,7 +16,7 @@ class RecipeMinerJob < Struct.new(:directory)
     )
 
     runtime = Benchmark.realtime do
-      RecipeMiner.new(directory: directory).start
+      Miner.new(directory: directory).start
     end
 
     formatted_runtime = sprintf("%.4f", runtime)

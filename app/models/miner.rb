@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class RecipeMiner
+class Miner
   require "httparty"
 
   def initialize(args = {})
@@ -31,7 +31,7 @@ class RecipeMiner
   end
 
   def array_of_website_urls
-    raise "RecipeMiner: website directory must be provided" unless @website_directory
+    raise "Miner: website directory must be provided" unless @website_directory
 
     File.read(@website_directory).split("\n")
   end

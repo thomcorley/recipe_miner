@@ -59,11 +59,11 @@ class Recipe < ApplicationRecord
     if only_days?
       "#{days}" + " day".pluralize(days)
     elsif only_hours?
-      "#{hours}" + " hr".pluralize(hours)
+      "#{hours}" + " hour".pluralize(hours)
     elsif hours_and_minutes?
-      "#{hours}" + " hr".pluralize(hours) + " #{minutes}" + " min"
+      "#{hours}" + " hour".pluralize(hours) + " #{minutes}" + " minute".pluralize(minutes)
     elsif only_minutes?
-      "#{minutes}" + " min"
+      "#{minutes}" + " minute".pluralize(minutes)
     end
   end
 
