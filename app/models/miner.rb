@@ -10,7 +10,7 @@ class Miner
 
   def start
     array_of_website_urls.each do |website_url|
-      next unless has_sitemap?(website_url)
+      verify_sitemap(website_url)
 
       WebsiteCrawlerJob.schedule(website_url)
     end
@@ -18,9 +18,11 @@ class Miner
 
   private
 
-  def has_sitemap?(website_url)
+  def verify_sitemap(website_url)
     sitemap_request = HTTParty.get(extract_url_from(website_url) + "/sitemap.xml")
-    sitemap_request.code == 200
+    code = sitemap_request.code
+
+    raise "[#{self.class}] Error: cannot find sitemap for #{website_url}" unless code == 200
   end
 
   # The url of the recipe website may have subdomains, query

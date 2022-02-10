@@ -31,12 +31,7 @@ class WebpageCrawler
 
   def recipe_finder
     host = URI.parse(@url).host
-
-    if host =~ /bbcgoodfood.com/
-      RecipeFinder::BbcGoodFood.new(@url)
-    else
-      RecipeFinder::JsonSchema.new(@url)
-    end
+    RecipeFinder::JsonSchema.new(@url)
   end
 
   def process_recipe

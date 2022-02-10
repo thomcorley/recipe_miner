@@ -29,7 +29,7 @@ class SitemapParser
 
       urls = []
 
-      sitemap_link_objects.each do |obj|
+      sitemap_link_objects.first(1000).each do |obj|
         xml_of_urls = HttpRequest::Get.new(obj.text).body
         urls << Nokogiri(xml_of_urls).css("loc").map(&:text)
       end
@@ -41,6 +41,6 @@ class SitemapParser
   end
 
   def is_a_sitemap_of_sitemaps?(sitemap_urls)
-    sitemap_urls.count < 20
+    sitemap_urls.count < 20 || @sitemap =~ /bbcgoodfood/
   end
 end

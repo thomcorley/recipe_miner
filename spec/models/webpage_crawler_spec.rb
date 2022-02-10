@@ -57,13 +57,13 @@ RSpec.describe WebpageCrawler do
     end
 
     context "selecting the correct recipe finder" do
-      it "selects BbcGoodFood finder for a BbcGoodFood url" do
-        bbc_goodfood_crawler = WebpageCrawler.new("https://www.bbcgoodfood.com")
-        allow_any_instance_of(HttpRequest::Get).to receive(:body).and_return("YES")
-        expect_any_instance_of(RecipeFinder::BbcGoodFood).to receive(:recipe_hash)
+      # it "selects BbcGoodFood finder for a BbcGoodFood url" do
+      #   bbc_goodfood_crawler = WebpageCrawler.new("https://www.bbcgoodfood.com")
+      #   allow_any_instance_of(HttpRequest::Get).to receive(:body).and_return("YES")
+      #   expect_any_instance_of(RecipeFinder::BbcGoodFood).to receive(:recipe_hash)
 
-        bbc_goodfood_crawler.crawl
-      end
+      #   bbc_goodfood_crawler.crawl
+      # end
 
       it "selects JsonSchema finder for a grubdaily url" do
         grubdaily_crawler = WebpageCrawler.new("https://www.grubdaily.com")
