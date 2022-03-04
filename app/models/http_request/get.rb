@@ -1,10 +1,9 @@
 # frozen_string_literal: true
-
 module HttpRequest
   class Get
-    def initialize(url)
+    def initialize(url:, requester: HTTParty)
       @url = url
-      @requester = HTTParty
+      @requester = requester
     end
 
     def response

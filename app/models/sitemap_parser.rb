@@ -8,7 +8,7 @@ class SitemapParser
 
   def array_of_urls
     if sitemap_is_url?
-      xml = HttpRequest::Get.new(@sitemap).body
+      xml = HttpRequest::Get.new(url: @sitemap).body
       parse_xml(xml)
     else
       parse_xml(@sitemap)
@@ -30,7 +30,7 @@ class SitemapParser
       urls = []
 
       sitemap_link_objects.first(1000).each do |obj|
-        xml_of_urls = HttpRequest::Get.new(obj.text).body
+        xml_of_urls = HttpRequest::Get.new(url: obj.text).body
         urls << Nokogiri(xml_of_urls).css("loc").map(&:text)
       end
 

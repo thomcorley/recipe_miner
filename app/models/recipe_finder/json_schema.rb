@@ -47,7 +47,7 @@ module RecipeFinder
     end
 
     def webpage_body
-      HttpRequest::Get.new(@url).body
+      HttpRequest::Get.new(url: @url).body
     end
 
     def recipe_json_present?(json)
