@@ -2,13 +2,21 @@
 
 class SearchController < ApplicationController
   def search
-    search_params = params[:search]
+    search_params = params[:query]
+
     if search_params
-      ingredient = search_params.delete(" ","").split(",")
+      ingredients = search_params.delete(" ","").split(" ")
+
       @recipes = Recipe.joins(:ingredients)
-        .where("ingredients.description LIKE ?", "%#{ingredient.first}%")
+        .where("recipes.title LIKE ?", "%#{ingredients.first}%")
         .uniq
-        .first(20)
+        .first(10)
+    end
+
+    respond_to do |format|
+      format.json do
+        render json: @recipes , include: [:ingredients, :instructions]
+      end
     end
   end
 
