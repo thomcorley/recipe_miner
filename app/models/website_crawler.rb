@@ -22,7 +22,7 @@ class WebsiteCrawler
   private
 
   def sitemap_response_code
-    HttpRequest::Get.new(sitemap_url).code
+    HttpRequest::Get.new(url: sitemap_url).code
   end
 
   def sitemap_url

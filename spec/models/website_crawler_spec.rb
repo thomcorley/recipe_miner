@@ -9,7 +9,7 @@ RSpec.describe WebsiteCrawler, type: :model do
     let(:crawler) { WebsiteCrawler.new(url: grubdaily_url) }
 
     it "crawls a website if it has a sitemap" do
-      requester = HttpRequest::Get.new(grubdaily_sitemap_url)
+      requester = HttpRequest::Get.new(url: grubdaily_sitemap_url)
       urls = ["https://www.grubdaily.com/sourdough"]
 
       stub_200_response_for(grubdaily_sitemap_url)

@@ -15,7 +15,7 @@ class SearchController < ApplicationController
 
     respond_to do |format|
       format.json do
-        render json: @recipes , include: [:ingredients, :instructions]
+        render json: @recipes, include: [:ingredients, :instructions]
       end
     end
   end

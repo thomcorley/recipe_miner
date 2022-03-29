@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+require "httparty"
 
 class Miner
-  require "httparty"
+  WEBSITE_DIRECTORY = "lib/website_directory.txt"
 
-  def initialize(args = {})
-    args = defaults.merge(args)
-    @website_directory = args[:directory]
+  def initialize(website_directory = WEBSITE_DIRECTORY)
+    @website_directory = website_directory
+    ensure_presence_of_directory
   end
 
   def start
@@ -18,11 +19,13 @@ class Miner
 
   private
 
+  attr_reader :website_directory
+
   def verify_sitemap(website_url)
     sitemap_request = HTTParty.get(extract_url_from(website_url) + "/sitemap.xml")
     code = sitemap_request.code
 
-    raise "[#{self.class}] Error: cannot find sitemap for #{website_url}" unless code == 200
+    raise Errors::SitemapNotFound.new(self.class, website_url) unless code == 200
   end
 
   # The url of the recipe website may have subdomains, query
@@ -33,12 +36,10 @@ class Miner
   end
 
   def array_of_website_urls
-    raise "Miner: website directory must be provided" unless @website_directory
-
-    File.read(@website_directory).split("\n")
+    File.read(website_directory).split("\n")
   end
 
-  def defaults
-    { directory: "lib/website_directory.txt" }
+  def ensure_presence_of_directory
+    raise Errors::MissingDirectory.new(self.class) unless website_directory
   end
 end

@@ -3,13 +3,11 @@
 
 class Recipe < ApplicationRecord
   AMP_REGEX = %r(\/amp([^a-zA-Z]|$|\s))
-  ISO_TIME_REGEX = /P((?<days>\d)+D)?T?((?<hours>\d+)H)?((?<minutes>\d+)M)?((?<seconds>\d+)S)?/
 
   has_many :ingredients, dependent: :destroy
   has_many :instructions, dependent: :destroy
 
   validates_uniqueness_of :recipe_url
-  validates_format_of :total_time, :with => ISO_TIME_REGEX
 
   before_save :deduplicate_recipes_with_amp_versions
 

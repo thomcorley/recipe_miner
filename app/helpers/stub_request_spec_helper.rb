@@ -14,6 +14,18 @@ module StubRequestSpecHelper
   end
 
   # rubocop:disable Layout/AlignHash, Layout/IndentHash
+  def stub_400_response_for(url)
+    stub_request(:get, url).
+      with(
+        headers: {
+          'Accept' => '*/*',
+          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'User-Agent' => 'Ruby'
+        }
+      ).to_return(status: 400, body: "", headers: {})
+  end
+
+  # rubocop:disable Layout/AlignHash, Layout/IndentHash
   def stub_response_for(url:, body:)
     stub_request(:get, url).
       with(
