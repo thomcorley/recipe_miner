@@ -16,13 +16,13 @@ describe Miner do
       it "enqueues the website crawler job" do
         expect(WebsiteCrawlerJob).to receive(:schedule).with("https://www.grubdaily.com/")
 
-        described_class.new("lib/test_website_directory.txt").start
+        described_class.start
       end
 
       it "uses the default if no directory is given" do
         expect(WebsiteCrawlerJob).to receive(:schedule).with("https://www.grubdaily.com/")
 
-        described_class.new.start
+        described_class.start
       end
     end
 
@@ -34,7 +34,7 @@ describe Miner do
         stub_400_response_for("https://www.grubdaily.com/sitemap.xml")
         error_message = "[#{described_class}] Cannot find sitemap for #{website_url}"
 
-        expect{ described_class.new.start }.to raise_error(Errors::SitemapNotFound, error_message)
+        expect{ described_class.start }.to raise_error(Errors::SitemapNotFound, error_message)
       end
 
       it "raises an error when initialized with no directory" do

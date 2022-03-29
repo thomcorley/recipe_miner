@@ -16,7 +16,7 @@ class MinerJob < Struct.new(:directory)
     )
 
     runtime = Benchmark.realtime do
-      Miner.new(directory: directory).start
+      Miner.start
     end
 
     formatted_runtime = sprintf("%.4f", runtime)
