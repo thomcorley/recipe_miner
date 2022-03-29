@@ -4,12 +4,16 @@ require "httparty"
 class Miner
   WEBSITE_DIRECTORY = "lib/website_directory.txt"
 
+  def self.start
+    new.begin_mining
+  end
+
   def initialize(website_directory = WEBSITE_DIRECTORY)
     @website_directory = website_directory
     ensure_presence_of_directory
   end
 
-  def start
+  def begin_mining
     array_of_website_urls.each do |website_url|
       verify_sitemap(website_url)
 
