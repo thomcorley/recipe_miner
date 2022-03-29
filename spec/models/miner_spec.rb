@@ -20,18 +20,18 @@ describe Miner do
       end
 
       it "uses the default if no directory is given" do
-        expect(WebsiteCrawlerJob).to receive(:schedule).with("https://www.bbcgoodfood.com/")
+        expect(WebsiteCrawlerJob).to receive(:schedule).with("https://www.grubdaily.com/")
 
         described_class.new.start
       end
     end
 
     context "error handling" do
-      let(:website_url) { "https://www.bbcgoodfood.com/" }
+      let(:website_url) { "https://www.grubdaily.com/" }
       let(:sitemap_url) { website_url + "/sitemap.xml" }
 
       it "raises an error when it cannot find a sitemap" do
-        stub_400_response_for("https://www.bbcgoodfood.com/sitemap.xml")
+        stub_400_response_for("https://www.grubdaily.com/sitemap.xml")
         error_message = "[#{described_class}] Cannot find sitemap for #{website_url}"
 
         expect{ described_class.new.start }.to raise_error(Errors::SitemapNotFound, error_message)
