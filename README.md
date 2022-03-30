@@ -6,7 +6,7 @@ Designed to provide an API back end to [recipe-miner-client](https://github.com/
 
 ## How it works
 
-The default parser is defined in the `RecipeFinder::JsonSchema` module which relies on the presence of standardised [Recipe Schema](https://schema.org/Recipe) in the HEAD of the recipe webpage. This is the metadata that allows search engines to provide summary recipe information inline in search results and most recipe websites utilise it.
+The default parser is defined in the `RecipeFinder::JsonSchema` module which relies on the presence of standardised [Recipe Schema](https://schema.org/Recipe) in the HEAD of the recipe webpage. This is the metadata that allows search engines to provide summary recipe information inline in search results.
 
 If a website doesn't implement the standard JSON schema for recipes, you can create a custom parsing class to obtain the recipe information from the HTML on the page and save it in the format required by RecipeMiner.
 
