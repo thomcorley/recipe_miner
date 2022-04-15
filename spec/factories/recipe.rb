@@ -9,6 +9,10 @@ FactoryBot.define do
     rating_count { 60 }
     description { "A french classic" }
     recipe_url { "https://www.grubdaily.com/onion-soup-#{random_string}" }
+
+    after(:build) do |recipe|
+      create_list :ingredient, 3, recipe: recipe
+    end
   end
 end
 
