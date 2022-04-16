@@ -1,16 +1,10 @@
 # frozen_string_literal: true
-
 class SearchController < ApplicationController
   def search
     search_params = params[:query]
 
     if search_params
-      ingredients = search_params.delete(" ","").split(" ")
-
-      @recipes = Recipe.joins(:ingredients)
-        .where("recipes.title LIKE ?", "%#{ingredients.first}%")
-        .uniq
-        .first(10)
+      @recipes = RecipeSearch.new(query: search_params).result
     end
 
     respond_to do |format|
